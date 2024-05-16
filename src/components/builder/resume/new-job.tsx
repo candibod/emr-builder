@@ -19,26 +19,22 @@ import { Controller, useForm } from "react-hook-form";
 import { z as zod } from "zod";
 
 import { paths } from "../../../paths";
-import { authClient } from "../../../lib/client";
+import { authClient, resumeClient } from "../../../lib/client";
 import CustomTextArea from "../../../lib/textarea";
 import { useUser } from "../../../hooks/use-user";
 
 const schema = zod.object({
-  email: zod.string().min(1, { message: "Email is required" }).email(),
-  password: zod.string().min(1, { message: "Password is required" }),
-  job_desc: zod.string().min(1, { message: "Password is required" }),
+  job_description: zod.string().min(1, { message: "Job Description is required" }),
+  job_role: zod.string(),
+  job_url: zod.string(),
 });
 
 type Values = zod.infer<typeof schema>;
 
-const defaultValues = { email: "", password: "", job_desc: "" } satisfies Values;
+const defaultValues = { job_description: "", job_role: "", job_url: "" } satisfies Values;
 
 export function NewJob(): React.JSX.Element {
-  const router = useRouter();
-
   const { checkSession } = useUser();
-
-  const [showPassword, setShowPassword] = React.useState<boolean>();
 
   const [isPending, setIsPending] = React.useState<boolean>(false);
 
@@ -51,9 +47,11 @@ export function NewJob(): React.JSX.Element {
 
   const onSubmit = React.useCallback(
     async (values: Values): Promise<void> => {
+      console.log("enter");
+      console.log(values);
       setIsPending(true);
 
-      const { error } = await authClient.signInWithPassword(values);
+      const { data, error } = await resumeClient.getMatchStats(values);
 
       if (error) {
         setError("root", { type: "server", message: error });
@@ -61,14 +59,9 @@ export function NewJob(): React.JSX.Element {
         return;
       }
 
-      // Refresh the auth state
-      await checkSession?.();
-
-      // UserProvider, for this case, will not refresh the router
-      // After refresh, GuestGuard will handle the redirect
-      router.refresh();
+      console.log(data);
     },
-    [checkSession, router, setError]
+    [setError]
   );
 
   return (
@@ -80,34 +73,34 @@ export function NewJob(): React.JSX.Element {
         <Stack spacing={2}>
           <Controller
             control={control}
-            name="job_desc"
-            render={({ field }) => (
-              <FormControl error={Boolean(errors.email)}>
-                <CustomTextArea minRows={7} maxRows={12} placeholder="Enter job description" />
+            name="job_description"
+            render={({ field: { onChange, value }, fieldState: { error } }) => (
+              <FormControl error={Boolean(errors.job_description)}>
+                <CustomTextArea minRows={7} maxRows={12} placeholder="Enter job description" error={error} onChange={onChange} value={value} />
                 <FormHelperText>Add Roles, Duties, Responsibilities, Qualifications to increase accuracy, leave sections like About Us, Company information, Compensation and Benefits</FormHelperText>
-                {errors.email ? <FormHelperText>{errors.email.message}</FormHelperText> : null}
+                {errors.job_description ? <FormHelperText>{errors.job_description.message}</FormHelperText> : null}
               </FormControl>
             )}
           />
           <Controller
             control={control}
-            name="email"
+            name="job_role"
             render={({ field }) => (
-              <FormControl error={Boolean(errors.email)}>
+              <FormControl error={Boolean(errors.job_role)}>
                 <InputLabel>URL (optional)</InputLabel>
-                <OutlinedInput {...field} label="Email address" type="email" />
-                {errors.email ? <FormHelperText>{errors.email.message}</FormHelperText> : null}
+                <OutlinedInput {...field} label="URL (optional)" type="text" />
+                {errors.job_role ? <FormHelperText>{errors.job_role.message}</FormHelperText> : null}
               </FormControl>
             )}
           />
           <Controller
             control={control}
-            name="email"
+            name="job_url"
             render={({ field }) => (
-              <FormControl error={Boolean(errors.email)}>
+              <FormControl error={Boolean(errors.job_url)}>
                 <InputLabel>Company Name (optional)</InputLabel>
-                <OutlinedInput {...field} label="Email address" type="email" />
-                {errors.email ? <FormHelperText>{errors.email.message}</FormHelperText> : null}
+                <OutlinedInput {...field} label="Company Name (optional)" type="text" />
+                {errors.job_url ? <FormHelperText>{errors.job_url.message}</FormHelperText> : null}
               </FormControl>
             )}
           />

@@ -6,9 +6,14 @@ interface TextAreaProps {
   placeholder: string;
   maxRows: number;
   minRows: number;
+  error: boolean;
+  onChange: Function;
+  value: string;
 }
 
-export default function CustomTextArea({ placeholder, maxRows, minRows }: TextAreaProps) {
+export default function CustomTextArea({ placeholder, maxRows, minRows, error, onChange, value }: TextAreaProps) {
+  const [text, setText] = React.useState<string>(value);
+
   const blue = {
     100: "#DAECFF",
     200: "#b6daff",
@@ -40,7 +45,6 @@ export default function CustomTextArea({ placeholder, maxRows, minRows }: TextAr
     border-radius: 8px;
     color: ${theme.palette.mode === "dark" ? grey[300] : grey[900]};
     background: ${theme.palette.mode === "dark" ? grey[900] : "#fff"};
-    border: 1px solid ${theme.palette.mode === "dark" ? grey[700] : grey[200]};
 
     &:hover {
       border-color: ${blue[400]};
@@ -58,5 +62,27 @@ export default function CustomTextArea({ placeholder, maxRows, minRows }: TextAr
   `
   );
 
-  return <Textarea aria-label="minimum height" maxRows={maxRows} minRows={minRows} placeholder={placeholder} />;
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value;
+
+    setText(value);
+    onChange(value);
+  };
+
+  return (
+    <Textarea
+      autoFocus
+      maxRows={maxRows}
+      minRows={minRows}
+      placeholder={placeholder}
+      sx={{ border: error ? "1px solid #f04438" : "1px solid #B0B8C4" }}
+      onChange={handleChange}
+      value={text}
+      onFocus={function (e) {
+        var val = e.target.value;
+        e.target.value = "";
+        e.target.value = val;
+      }}
+    />
+  );
 }
