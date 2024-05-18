@@ -103,7 +103,6 @@ class AuthClient {
 
     return apiRequestHandler("auth/signin", "POST", { email: email, password: password })
       .then((response) => {
-        console.log(response);
         if (response.ok) {
           const token = generateToken();
           localStorage.setItem("emr-auth-token", token);
@@ -115,43 +114,6 @@ class AuthClient {
       .catch((error) => {
         return { error: error.message };
       });
-
-    // const response: ApiResponse = apiRequestHandler("auth/signin", "POST", { email: email, password: password });
-    // console.log("final");
-    // console.log(response);
-
-    // if (response.ok) {
-    //   const token = generateToken();
-    //   localStorage.setItem("emr-auth-token", token);
-    //   return {};
-    // } else return { error: response.message };
-
-    // return fetch(process.env.NEXT_PUBLIC_API_HOST_URL + "auth/signin", {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   credentials: "include",
-    //   body: JSON.stringify({ email: email, password: password }),
-    // })
-    //   .then((response: Response) => {
-    //     if (response.ok) {
-    //       const token = generateToken();
-    //       localStorage.setItem("emr-auth-token", token);
-    //       return {};
-    //     }
-
-    //     return response.json().then((res: ErrorResponse) => {
-    //       if (Object.keys(res).indexOf("message") > -1) {
-    //         return { error: res.message };
-    //       }
-    //       return { error: "Something went wrong, Please reload the page and try again." };
-    //     });
-    //   })
-    //   .catch((error) => {
-    //     // Log the error -> error.message
-    //     return { error: "Something went wrong, Please try again after some time." };
-    //   });
   }
 
   async resetPassword(_: ResetPasswordParams): Promise<{ error?: string }> {
@@ -163,9 +125,6 @@ class AuthClient {
   }
 
   async getUser(): Promise<{ data?: User | null; error?: string }> {
-    // Make API request
-
-    // We do not handle the API, so just check if we have a token in localStorage.
     const token = localStorage.getItem("emr-auth-token");
 
     if (!token) {
@@ -176,24 +135,18 @@ class AuthClient {
   }
 
   async signOut(): Promise<{ error?: string }> {
-    return fetch(process.env.NEXT_PUBLIC_API_HOST_URL + "auth/logout", {
-      method: "POST",
-      credentials: "include",
-    })
-      .then((response: Response) => {
+    localStorage.removeItem("emr-auth-token");
+    return apiRequestHandler("auth/logout", "POST")
+      .then((response) => {
         if (response.ok) {
-          localStorage.removeItem("emr-auth-token");
           return {};
+        } else {
+          return { error: response.message };
         }
-
-        return { error: "Something went wrong, Please reload the page and try again." };
       })
       .catch((error) => {
-        // Log the error -> error.message
-        return { error: "Something went wrong, Please try again after some time." };
+        return { error: error.message };
       });
-
-    return {};
   }
 }
 
@@ -201,40 +154,40 @@ export interface GetMatchStatsParams {
   job_description: string;
   job_role: string;
   job_url: string;
+  company_name: string;
 }
 
 class ResumeClient {
-  async getMatchStats(params: GetMatchStatsParams): Promise<{ data?: User | null; error?: string }> {
-    const { job_description, job_role, job_url } = params;
+  async getMatchStats(params: GetMatchStatsParams): Promise<{ data?: ApiResponse; error?: string }> {
+    const { job_description, job_role, job_url, company_name } = params;
 
-    return fetch(process.env.NEXT_PUBLIC_API_HOST_URL + "resume/job-details", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify({ job_description: job_description, job_role: job_role, job_url: job_url }),
-    })
-      .then((response: Response) => {
+    return apiRequestHandler("resume/job-details", "POST", { job_description: job_description, job_role: job_role, job_url: job_url, company_name: company_name })
+      .then((response) => {
         if (response.ok) {
-          console.log(response);
-          console.log(response.json());
-          return {};
+          return { data: response.data };
+        } else {
+          return { error: response.message };
         }
-
-        return response.json().then((res: ErrorResponse) => {
-          if (Object.keys(res).indexOf("message") > -1) {
-            return { error: res.message };
-          }
-          return { error: "Something went wrong, Please reload the page and try again." };
-        });
       })
       .catch((error) => {
-        // Log the error -> error.message
-        return { error: "Something went wrong, Please try again after some time." };
+        return { error: error.message };
       });
+  }
 
-    return { data: { id: "test" } };
+  async updateResumeForBuilder(params): Promise<{ data?: ApiResponse; error?: string }> {
+    const { resume_id, builder_id } = params;
+
+    return apiRequestHandler("resume/job-details", "PUT", { resume_uuid: resume_id, builder_uuid: builder_id })
+      .then((response) => {
+        if (response.ok) {
+          return { data: response.data };
+        } else {
+          return { error: response.message };
+        }
+      })
+      .catch((error) => {
+        return { error: error.message };
+      });
   }
 }
 
