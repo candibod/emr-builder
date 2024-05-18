@@ -11,6 +11,7 @@ export const paths = {
   builder: {
     newJob: "/builder/new-job",
     resumeReviews: "/builder/resume-reviews",
+    resumeReview: "/builder/resume-review/",
     uploadResume: "/builder/upload-resume",
     account: "/builder/account",
   },

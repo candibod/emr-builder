@@ -157,6 +157,11 @@ export interface GetMatchStatsParams {
   company_name: string;
 }
 
+export interface UpdateMatchStatsParams {
+  resume_id: string;
+  builder_id: string;
+}
+
 class ResumeClient {
   async getMatchStats(params: GetMatchStatsParams): Promise<{ data?: ApiResponse; error?: string }> {
     const { job_description, job_role, job_url, company_name } = params;
@@ -174,10 +179,24 @@ class ResumeClient {
       });
   }
 
-  async updateResumeForBuilder(params): Promise<{ data?: ApiResponse; error?: string }> {
+  async updateResumeForBuilder(params: UpdateMatchStatsParams): Promise<{ data?: ApiResponse; error?: string }> {
     const { resume_id, builder_id } = params;
 
     return apiRequestHandler("resume/job-details", "PUT", { resume_uuid: resume_id, builder_uuid: builder_id })
+      .then((response) => {
+        if (response.ok) {
+          return { data: response.data };
+        } else {
+          return { error: response.message };
+        }
+      })
+      .catch((error) => {
+        return { error: error.message };
+      });
+  }
+
+  async getResumeReviews(): Promise<{ data?: ApiResponse; error?: string }> {
+    return apiRequestHandler("resume/resume-reviews", "GET")
       .then((response) => {
         if (response.ok) {
           return { data: response.data };

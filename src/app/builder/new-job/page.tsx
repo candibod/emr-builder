@@ -6,6 +6,6 @@ import { NewJob } from "../../../components/builder/resume/new-job";
 
 export const metadata = { title: `Match Stats | ${config.site.name}` } satisfies Metadata;
 
-export default function ResumeReviews(): React.JSX.Element {
+export default function Page(): React.JSX.Element {
   return <NewJob />;
 }
