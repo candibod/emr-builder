@@ -208,6 +208,20 @@ class ResumeClient {
         return { error: error.message };
       });
   }
+
+  async getResumeReview(id: string): Promise<{ data?: ApiResponse; error?: string }> {
+    return apiRequestHandler("resume/resume-review/" + id, "GET")
+      .then((response) => {
+        if (response.ok) {
+          return { data: response.data };
+        } else {
+          return { error: response.message };
+        }
+      })
+      .catch((error) => {
+        return { error: error.message };
+      });
+  }
 }
 
 export const authClient = new AuthClient();

@@ -14,6 +14,22 @@ import FormControl from "@mui/material/FormControl";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import FormHelperText from "@mui/material/FormHelperText";
 import Chip from "@mui/material/Chip";
+import ButtonGroup from "@mui/material/ButtonGroup";
+import { TextareaAutosize as BaseTextareaAutosize } from "@mui/base/TextareaAutosize";
+import { styled } from "@mui/system";
+import Divider from "@mui/material/Divider";
+import { useParams } from "next/navigation";
+
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
+import IconButton from "@mui/material/IconButton";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
 
 import { z as zod } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -22,7 +38,7 @@ import TextField from "@mui/material/TextField";
 
 import { resumeClient } from "../../../lib/client";
 import CustomTextArea from "../../../lib/textarea";
-import { NewJobStats } from "../resume/new-job-stats";
+import { ResumePreview } from "../review/resume-preview";
 
 const schema = zod.object({
   job_description: zod.string().min(1, { message: "Job Description is required" }),
@@ -38,6 +54,32 @@ const defaultValues = { job_description: "", job_role: "", job_url: "", company_
 export function ResumeReview(): React.JSX.Element {
   const [isPending, setIsPending] = React.useState<boolean>(false);
   const [jobStatsData, setJobStatsData] = React.useState({});
+  const [resume, setResume] = React.useState();
+  const params = useParams();
+
+  React.useEffect(() => {
+    async function fetchMyAPI() {
+      setIsPending(true);
+      const { slug } = params;
+      if (slug !== undefined) {
+        const { data, error } = await resumeClient.getResumeReview(slug);
+
+        if (error) {
+          console.log("error", error);
+          setIsPending(false);
+          return;
+        }
+
+        console.log(data);
+        if (data) {
+          setJobStatsData(data);
+          setResume(data.resume);
+        }
+      }
+    }
+
+    fetchMyAPI();
+  }, []);
 
   const {
     control,
@@ -122,17 +164,59 @@ export function ResumeReview(): React.JSX.Element {
           <Chip label="primary" color="primary" variant="outlined" />
           <Chip label="primary" color="primary" variant="outlined" />
         </Stack>
+        <Box sx={{ width: "100%", textAlign: "center", mt: 1, mb: 2 }}>
+          <TableContainer component={Paper}>
+            <Table sx={{ minWidth: 650 }} aria-label="simple table">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Bullet</TableCell>
+                  <TableCell>Actions</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                <TableRow key="gg" sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
+                  <TableCell component="th" scope="row">
+                    o suppress this warning, you need to explicitly provide the `palette.paperChannel` as a string
+                  </TableCell>
+                  <TableCell align="right">
+                    <ButtonGroup size="small" aria-label="Small button group">
+                      <Button>Add</Button>
+                      <Button>Replace</Button>
+                    </ButtonGroup>
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
+        <Divider variant="middle" flexItem />
         <Box
           component="form"
           sx={{
             "& > :not(style)": { m: 1, width: "25ch" },
+            marginTop: "8px",
           }}
           noValidate
           autoComplete="off"
         >
-          <TextField id="outlined-basic" label="Outlined" variant="outlined" />
-          <TextField id="filled-basic" label="Filled" variant="filled" />
-          <TextField id="standard-basic" label="Standard" variant="standard" />
+          <FormControl error={Boolean(errors.job_url)}>
+            <TextField label="Experience" variant="outlined" />
+            <FormHelperText>Ex: Collaborated with CRM Team</FormHelperText>
+            {errors.job_url ? <FormHelperText>{errors.job_url.message}</FormHelperText> : null}
+          </FormControl>
+          <FormControl error={Boolean(errors.job_url)}>
+            <TextField label="Activity" variant="outlined" />
+            <FormHelperText>Ex: Develop and enhance the UX</FormHelperText>
+            {errors.job_url ? <FormHelperText>{errors.job_url.message}</FormHelperText> : null}
+          </FormControl>
+          <FormControl error={Boolean(errors.job_url)}>
+            <TextField label="Result" variant="outlined" />
+            <FormHelperText>Ex: Increase conversion rate by 6%</FormHelperText>
+            {errors.job_url ? <FormHelperText>{errors.job_url.message}</FormHelperText> : null}
+          </FormControl>
+        </Box>
+        <Box sx={{ width: "100%", textAlign: "center" }}>
+          <Button variant="contained">AI Generate</Button>
         </Box>
       </Box>
       <Box
@@ -149,7 +233,7 @@ export function ResumeReview(): React.JSX.Element {
         }}
       >
         <Stack spacing={3}>
-          <NewJobStats jobStatsData={jobStatsData} />
+          <ResumePreview resume={resume} />
         </Stack>
       </Box>
     </Box>
