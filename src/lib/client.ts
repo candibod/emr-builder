@@ -162,6 +162,13 @@ export interface UpdateMatchStatsParams {
   builder_id: string;
 }
 
+export interface ResumeResponse {
+  ok?: boolean;
+  message?: string;
+  data?: { resume: object; matched_skills: string; unmatched_skills: string; match_percent: number; relevant_bullets: Array<string>; builder_id: string };
+  errors?: object;
+}
+
 class ResumeClient {
   async getMatchStats(params: GetMatchStatsParams): Promise<{ data?: ApiResponse; error?: string }> {
     const { job_description, job_role, job_url, company_name } = params;
@@ -209,8 +216,22 @@ class ResumeClient {
       });
   }
 
-  async getResumeReview(id: string): Promise<{ data?: ApiResponse; error?: string }> {
+  async getResumeReview(id: string): Promise<{ data?: ResumeResponse; error?: string }> {
     return apiRequestHandler("resume/resume-review/" + id, "GET")
+      .then((response) => {
+        if (response.ok) {
+          return { data: response.data };
+        } else {
+          return { error: response.message };
+        }
+      })
+      .catch((error) => {
+        return { error: error.message };
+      });
+  }
+
+  async getRelevantBullets(skills_concatenated: string): Promise<{ data?: ResumeResponse; error?: string }> {
+    return apiRequestHandler("resume/relevant-bullets", "GET", { skills: skills_concatenated })
       .then((response) => {
         if (response.ok) {
           return { data: response.data };

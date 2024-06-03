@@ -27,10 +27,13 @@ export interface LayoutProps {
   children: React.ReactNode;
 }
 
-export function ResumePreview(props): React.JSX.Element {
+export function ResumePreview({ resumeDetails }): React.JSX.Element {
   const router = useRouter();
-  const resume = props.resume;
-  console.log(resume);
+  const [resume, setResume] = React.useState(undefined);
+
+  React.useEffect(() => {
+    setResume(resumeDetails);
+  }, [resumeDetails]);
 
   function get_split_element_in_string(element: string, index: number): string {
     return element.split(",")[index];

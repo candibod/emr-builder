@@ -15,6 +15,8 @@ import Stack from "@mui/material/Stack";
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+
+import getFormattedTime from "../../../lib/utils";
 import { resumeClient } from "../../../lib/client";
 
 import { useRouter } from "next/navigation";
@@ -93,7 +95,7 @@ export function ResumeReviews(): React.JSX.Element {
                   <TableCell align="right">{row.job_role}</TableCell>
                   <TableCell align="right">{row.match_percentage}</TableCell>
                   <TableCell align="right">{row.resume_name}</TableCell>
-                  <TableCell align="right">{row.updated_at}</TableCell>
+                  <TableCell align="right">{getFormattedTime(row.updated_at)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
