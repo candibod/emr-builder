@@ -49,15 +49,14 @@ import AdjustIcon from "@mui/icons-material/Adjust";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 
 const schema = zod.object({
-  job_description: zod.string().min(1, { message: "Job Description is required" }),
-  job_role: zod.string().min(1, { message: "Job Description is required" }),
-  job_url: zod.string(),
-  company_name: zod.string(),
+  experience: zod.string().min(6, { message: "Experience is required, min length: 6" }),
+  activity: zod.string().min(6, { message: "Activity is required, min length: 6" }),
+  result: zod.string().min(6, { message: "Result is required, min length: 6" }),
 });
 
 type Values = zod.infer<typeof schema>;
 
-const defaultValues = { job_description: "", job_role: "", job_url: "", company_name: "" } satisfies Values;
+const defaultValues = { experience: "", activity: "", result: "" } satisfies Values;
 
 export function ResumeReview(): React.JSX.Element {
   const [isPending, setIsPending] = React.useState<boolean>(true);
@@ -65,6 +64,7 @@ export function ResumeReview(): React.JSX.Element {
   const [resume, setResume] = React.useState();
   const [selectedSkills, setSelectedSkills] = React.useState<Array<string>>([]);
   const [relevantBullets, setRelevantBullets] = React.useState<Array<string>>([]);
+  const [generatedText, setGeneratedText] = React.useState({});
   const params = useParams();
 
   React.useEffect(() => {
@@ -103,17 +103,23 @@ export function ResumeReview(): React.JSX.Element {
     async (values: Values): Promise<void> => {
       setIsPending(true);
 
-      const { data, error } = await resumeClient.getMatchStats(values);
+      let skills_concatenated = "";
+      for (let i = 0; i < selectedSkills.length; i++) {
+        skills_concatenated = skills_concatenated + selectedSkills[i] + ",";
+      }
+      values["keywords"] = skills_concatenated;
+      const { data, error } = await resumeClient.generateText(values);
 
       if (error) {
         setError("root", { type: "server", message: error });
-        // setIsPending(false);
+        setIsPending(false);
         return;
       }
 
-      if (data) setJobStatsData(data);
+      if (data) setGeneratedText(data);
+      setIsPending(false);
     },
-    [setError]
+    [setError, selectedSkills]
   );
 
   function handleDelete() {}
@@ -199,28 +205,19 @@ export function ResumeReview(): React.JSX.Element {
                 <Grid container justifyContent="space-between" direction="row">
                   <Box>
                     <Typography component="div" variant="h5">
-                      Live From Space
+                      {jobStatsData && jobStatsData.job_company ? jobStatsData.job_company : "Company"}
                     </Typography>
                     <Typography variant="subtitle1" color="text.secondary" component="div">
-                      Mac Miller
+                      {jobStatsData && jobStatsData.job_role}
                     </Typography>
                   </Box>
                   <Box>
                     <Box sx={{ position: "relative", display: "inline-flex" }}>
-                      <CircularProgress variant="determinate" value={50} />
-                      <Box
-                        sx={{
-                          top: 0,
-                          left: 0,
-                          bottom: 0,
-                          right: 0,
-                          position: "absolute",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
-                      >
-                        <Typography variant="caption" component="div" color="text.secondary">{`${Math.round(50)}%`}</Typography>
+                      <CircularProgress variant="determinate" value={jobStatsData ? jobStatsData.match_percent : 0} />
+                      <Box sx={{ top: 0, left: 0, bottom: 0, right: 0, position: "absolute", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <Typography variant="caption" component="div" color="text.secondary">
+                          {jobStatsData && `${Math.round(jobStatsData.match_percent)}%`}
+                        </Typography>
                       </Box>
                     </Box>
                   </Box>
@@ -231,10 +228,7 @@ export function ResumeReview(): React.JSX.Element {
             <Typography variant="h5" sx={{ mt: 2 }} gutterBottom>
               Missing Skills
             </Typography>
-            <Typography variant="h6" sx={{ mt: 2 }} gutterBottom>
-              Technical
-            </Typography>
-            <Stack direction="row" useFlexGap flexWrap="wrap" spacing={1} sx={{ mb: 2 }}>
+            <Stack direction="row" useFlexGap flexWrap="wrap" spacing={1} sx={{ mt: 1, mb: 2 }}>
               {jobStatsData.unmatched_skills.length > 0 ? (
                 <>
                   {jobStatsData.unmatched_skills.split(",").map((keyword) => (
@@ -247,12 +241,6 @@ export function ResumeReview(): React.JSX.Element {
                 </Alert>
               )}
             </Stack>
-            <Typography variant="h6" sx={{ mt: 1 }} gutterBottom>
-              Non Technical
-            </Typography>
-            <Alert severity="info" color="info" sx={{ mb: 3 }}>
-              No Matching Records.
-            </Alert>
             <Divider flexItem />
             <Typography variant="h5" sx={{ mt: 2 }} gutterBottom>
               Matched Skills
@@ -284,9 +272,9 @@ export function ResumeReview(): React.JSX.Element {
                     <Chip key={key} label={keyword} color="primary" variant="outlined" />
                   ))}
                 </Stack>
-                <Box sx={{ width: "100%", textAlign: "center", mt: 1, mb: 2 }}>
+                <Box sx={{ textAlign: "center", mt: 1, mb: 2 }}>
                   <TableContainer component={Paper}>
-                    <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                    <Table aria-label="simple table">
                       <TableHead>
                         <TableRow>
                           <TableCell>Sample Bullet(s)</TableCell>
@@ -325,31 +313,70 @@ export function ResumeReview(): React.JSX.Element {
                 <Box
                   component="form"
                   sx={{
-                    "& > :not(style)": { m: 1, width: "25ch" },
+                    "& > :not(style)": { m: 1 },
                     marginTop: "8px",
+                    textAlign: "center",
                   }}
                   noValidate
                   autoComplete="off"
+                  onSubmit={handleSubmit(onSubmit)}
                 >
-                  <FormControl error={Boolean(errors.job_url)}>
-                    <TextField label="Experience" variant="outlined" />
-                    <FormHelperText>Ex: Collaborated with CRM Team</FormHelperText>
-                    {errors.job_url ? <FormHelperText>{errors.job_url.message}</FormHelperText> : null}
-                  </FormControl>
-                  <FormControl error={Boolean(errors.job_url)}>
-                    <TextField label="Activity" variant="outlined" />
-                    <FormHelperText>Ex: Develop and enhance the UX</FormHelperText>
-                    {errors.job_url ? <FormHelperText>{errors.job_url.message}</FormHelperText> : null}
-                  </FormControl>
-                  <FormControl error={Boolean(errors.job_url)}>
-                    <TextField label="Result" variant="outlined" />
-                    <FormHelperText>Ex: Increase conversion rate by 6%</FormHelperText>
-                    {errors.job_url ? <FormHelperText>{errors.job_url.message}</FormHelperText> : null}
-                  </FormControl>
+                  <Controller
+                    control={control}
+                    name="experience"
+                    render={({ field }) => (
+                      <FormControl error={Boolean(errors.experience)}>
+                        <InputLabel>Experience</InputLabel>
+                        <OutlinedInput {...field} label="Experience" type="text" />
+                        <FormHelperText>Ex: Collaborated with CRM Team</FormHelperText>
+                        {errors.experience ? <FormHelperText>{errors.experience.message}</FormHelperText> : null}
+                      </FormControl>
+                    )}
+                  />
+                  <Controller
+                    control={control}
+                    name="activity"
+                    render={({ field }) => (
+                      <FormControl error={Boolean(errors.activity)}>
+                        <InputLabel>Activity</InputLabel>
+                        <OutlinedInput {...field} label="Activity" type="text" />
+                        <FormHelperText>Ex: Develop and enhance the UX</FormHelperText>
+                        {errors.activity ? <FormHelperText>{errors.activity.message}</FormHelperText> : null}
+                      </FormControl>
+                    )}
+                  />
+                  <Controller
+                    control={control}
+                    name="result"
+                    render={({ field }) => (
+                      <FormControl error={Boolean(errors.result)}>
+                        <InputLabel>Result</InputLabel>
+                        <OutlinedInput {...field} label="Result" type="text" />
+                        <FormHelperText>Ex: Increase conversion rate by 6%</FormHelperText>
+                        {errors.result ? <FormHelperText>{errors.result.message}</FormHelperText> : null}
+                      </FormControl>
+                    )}
+                  />
+                  {errors.root ? <Alert color="error">{errors.root.message}</Alert> : null}
+                  <Box sx={{ width: "100%", textAlign: "center" }}>
+                    <Button disabled={isPending} type="submit" variant="contained">
+                      AI Generate
+                    </Button>
+                  </Box>
                 </Box>
-                <Box sx={{ width: "100%", textAlign: "center" }}>
-                  <Button variant="contained">AI Generate</Button>
-                </Box>
+                {Object.keys(generatedText).length > 0 ? (
+                  <Box sx={{ textAlign: "center", mt: 3, mb: 3, display: "flex", justifyContent: "center", flexDirection: "column" }}>
+                    <Alert icon={false} severity="info">
+                      {generatedText.bullet}
+                      <Stack spacing={2} direction="row" sx={{ mt: 2, justifyContent: "center" }}>
+                        <Button variant="outlined">Add</Button>
+                        <Button variant="outlined">Replace</Button>
+                      </Stack>
+                    </Alert>
+                  </Box>
+                ) : (
+                  <></>
+                )}
               </>
             ) : (
               <Alert severity="info" color="info" sx={{ mb: 3 }}>
@@ -371,7 +398,7 @@ export function ResumeReview(): React.JSX.Element {
             }}
           >
             <Stack spacing={3}>
-              <ResumePreview resumeDetails={resume} />
+              <ResumePreview resumeDetails={resume} matchedSkills={jobStatsData ? jobStatsData.matched_skills : ""} />
             </Stack>
           </Box>
         </>

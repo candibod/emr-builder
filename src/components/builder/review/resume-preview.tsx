@@ -1,33 +1,18 @@
 "use client";
 
 import * as React from "react";
-import { createContext, useContext } from "react";
 import { useRouter } from "next/navigation";
-import { paths } from "../../../paths";
 
 import Box from "@mui/material/Box";
-import Card from "@mui/material/Card";
-import List from "@mui/material/List";
-import Stack from "@mui/material/Stack";
-import Avatar from "@mui/material/Avatar";
-import Typography from "@mui/material/Typography";
-import CardActions from "@mui/material/CardActions";
-import CardContent from "@mui/material/CardContent";
-import Grid from "@mui/material/Unstable_Grid2";
 import Divider from "@mui/material/Divider";
-import ListItem from "@mui/material/ListItem";
-
-import Button from "@mui/material/Button";
-import Paper from "@mui/material/Paper";
-import Chip from "@mui/material/Chip";
-import CardHeader from "@mui/material/CardHeader";
-import { resumeClient } from "../../../lib/client";
+import Grid from "@mui/material/Unstable_Grid2";
+import Typography from "@mui/material/Typography";
 
 export interface LayoutProps {
   children: React.ReactNode;
 }
 
-export function ResumePreview({ resumeDetails }): React.JSX.Element {
+export function ResumePreview({ resumeDetails, matchedSkills }): React.JSX.Element {
   const router = useRouter();
   const [resume, setResume] = React.useState(undefined);
 
@@ -37,6 +22,24 @@ export function ResumePreview({ resumeDetails }): React.JSX.Element {
 
   function get_split_element_in_string(element: string, index: number): string {
     return element.split(",")[index];
+  }
+
+  const matched_skills = matchedSkills.split(",");
+  console.log(matched_skills);
+  function highlight_text(point: string) {
+    let updated_string = point;
+
+    for (let i = 0; i < matched_skills.length; i++) {
+      const index = updated_string.toLowerCase().indexOf(matched_skills[i].trim());
+      const text = " <span class='skill-highlight'>";
+
+      if (index !== -1) {
+        const result = text.concat(updated_string.substring(index, index + matched_skills[i].trim().length), "</span>");
+        updated_string = updated_string.substring(0, index) + result + updated_string.substring(index + matched_skills[i].trim().length);
+      }
+    }
+
+    return updated_string;
   }
 
   return resume ? (
@@ -85,7 +88,7 @@ export function ResumePreview({ resumeDetails }): React.JSX.Element {
         <ul>
           {resume.skills.map((skills, index: number) => (
             <li key={"skills" + index}>
-              <b>{skills.category}</b>: {skills.skills.join(", ")}
+              <b>{skills.category}</b>:&nbsp;<span dangerouslySetInnerHTML={{ __html: highlight_text(skills.skills.join(", ")) }}></span>
             </li>
           ))}
         </ul>
@@ -111,7 +114,7 @@ export function ResumePreview({ resumeDetails }): React.JSX.Element {
                 <Box sx={{ textAlign: "justify" }}>
                   <ul>
                     {experience.bullets.map((bullet) => (
-                      <li key={bullet}>{bullet}</li>
+                      <li dangerouslySetInnerHTML={{ __html: highlight_text(bullet) }} key={bullet}></li>
                     ))}
                   </ul>
                 </Box>
@@ -138,7 +141,7 @@ export function ResumePreview({ resumeDetails }): React.JSX.Element {
                 <Box sx={{ textAlign: "justify" }}>
                   <ul>
                     {project.bullets.map((bullet) => (
-                      <li key={bullet}>{bullet}</li>
+                      <li dangerouslySetInnerHTML={{ __html: highlight_text(bullet) }} key={bullet}></li>
                     ))}
                   </ul>
                 </Box>

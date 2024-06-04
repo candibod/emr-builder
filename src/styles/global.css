@@ -32,6 +32,10 @@ body {
   height: 100%;
 }
 
+.skill-highlight {
+  background-color: #d7ffdf;
+}
+
 /* width */
 ::-webkit-scrollbar {
   width: 6px;

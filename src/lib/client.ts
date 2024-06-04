@@ -162,6 +162,13 @@ export interface UpdateMatchStatsParams {
   builder_id: string;
 }
 
+export interface GenerateTextParams {
+  experience: string;
+  activity: string;
+  result: string;
+  keywords: string;
+}
+
 export interface ResumeResponse {
   ok?: boolean;
   message?: string;
@@ -231,7 +238,23 @@ class ResumeClient {
   }
 
   async getRelevantBullets(skills_concatenated: string): Promise<{ data?: ResumeResponse; error?: string }> {
-    return apiRequestHandler("resume/relevant-bullets", "GET", { skills: skills_concatenated })
+    return apiRequestHandler("resume/relevant-bullets", "POST", { skills: skills_concatenated })
+      .then((response) => {
+        if (response.ok) {
+          return { data: response.data };
+        } else {
+          return { error: response.message };
+        }
+      })
+      .catch((error) => {
+        return { error: error.message };
+      });
+  }
+
+  async generateText(params: GenerateTextParams): Promise<{ data?: ResumeResponse; error?: string }> {
+    const { experience, activity, result, keywords } = params;
+
+    return apiRequestHandler("resume/generate-text", "POST", { experience: experience, activity: activity, result: result, skills: keywords })
       .then((response) => {
         if (response.ok) {
           return { data: response.data };

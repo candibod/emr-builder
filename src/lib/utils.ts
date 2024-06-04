@@ -1,15 +1,17 @@
-export default function getFormattedTime(time) {
+export default function getFormattedTime(time: string): string {
   let strArray = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
   let utcDate = time;
   let localDate = new Date(utcDate);
   let hr = localDate.getHours();
-  let ampm = "am";
+  let zone = "am";
+
   if (hr > 12) {
     hr -= 12;
-    ampm = "pm";
+    zone = "pm";
   }
-  let datestring = localDate.getDate() + "-" + strArray[localDate.getMonth()] + "-" + localDate.getFullYear() + " " + hr + ":" + localDate.getMinutes() + ampm;
 
-  return datestring;
+  let formattedString = localDate.getDate() + "-" + strArray[localDate.getMonth()] + "-" + localDate.getFullYear() + " " + hr + ":" + localDate.getMinutes() + zone;
+
+  return formattedString;
 }
