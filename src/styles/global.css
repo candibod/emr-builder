@@ -36,6 +36,65 @@ body {
   background-color: #d7ffdf;
 }
 
+.resume-bullets p {
+  margin-top: 5px;
+  margin-bottom: 0;
+}
+
+.resume-bullets p:before {
+  content: "●";
+  padding-right: 6px;
+}
+
+.resume-bullets img {
+  transition: transform 0.2s;
+}
+
+.resume-bullets img:hover {
+  -ms-transform: scale(1.5); /* IE 9 */
+  -webkit-transform: scale(1.5); /* Safari 3-8 */
+  transform: scale(1.5);
+}
+
+.intro {
+  width: 400px;
+  margin: auto;
+}
+
+.list {
+  width: 430px;
+  margin: 10px auto;
+  padding: 15px;
+}
+.item {
+  border: 1px solid black;
+  overflow: hidden;
+  transform-origin: 30% 50% 0px;
+  padding-left: 20px;
+  background: white;
+  max-height: 100%;
+}
+.item .dragHandle {
+  visibility: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+  cursor: move;
+  width: 20px;
+  height: 16px;
+  content: ")";
+}
+.item:hover .dragHandle,
+.item.dragged .dragHandle {
+  visibility: visible;
+}
+.item h2 {
+  margin: 0;
+}
+.item .subtitle {
+  font-weight: bold;
+}
+
 /* width */
 ::-webkit-scrollbar {
   width: 6px;

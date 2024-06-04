@@ -7,14 +7,69 @@ import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
 import Grid from "@mui/material/Unstable_Grid2";
 import Typography from "@mui/material/Typography";
+import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
+
+import DraggableList from "react-draggable-list";
+
+interface PlanetListItem {
+  name: string;
+  subtitle?: boolean;
+}
+
+interface PlanetProps {
+  item: PlanetListItem;
+  itemSelected: number;
+  dragHandleProps: object;
+}
+interface PlanetState {
+  value: number;
+}
 
 export interface LayoutProps {
   children: React.ReactNode;
 }
 
-export function ResumePreview({ resumeDetails, matchedSkills }): React.JSX.Element {
+class PlanetItem extends React.Component<PlanetProps, PlanetState> {
+  getDragHeight() {
+    return this.props.item.subtitle ? 47 : 28;
+  }
+
+  render() {
+    const { item, itemSelected, dragHandleProps } = this.props;
+    const scale = itemSelected * 0.05 + 1;
+    const shadow = itemSelected * 15 + 1;
+    const dragged = itemSelected !== 0;
+
+    return (
+      <div
+        className={"item"}
+        style={{
+          transform: `scale(${scale})`,
+          boxShadow: `rgba(0, 0, 0, 0.3) 0px ${shadow}px ${2 * shadow}px 0px`,
+        }}
+      >
+        <div className="dragHandle" {...dragHandleProps}>
+          <DragIndicatorIcon />
+        </div>
+        <div>{item.name}</div>
+      </div>
+    );
+  }
+}
+
+export function ResumePreview({ resumeDetails, matchedSkills, bulletEditStatus }): React.JSX.Element {
   const router = useRouter();
   const [resume, setResume] = React.useState(undefined);
+  const [list, setList] = React.useState([
+    { name: "Mercury" },
+    { name: "Venus" },
+    { name: "Earth", subtitle: true },
+    { name: "Mars" },
+    { name: "Jupiter" },
+    { name: "Saturn", subtitle: true },
+    { name: "Uranus", subtitle: true },
+    { name: "Neptune" },
+  ]);
 
   React.useEffect(() => {
     setResume(resumeDetails);
@@ -25,7 +80,6 @@ export function ResumePreview({ resumeDetails, matchedSkills }): React.JSX.Eleme
   }
 
   const matched_skills = matchedSkills.split(",");
-  console.log(matched_skills);
   function highlight_text(point: string) {
     let updated_string = point;
 
@@ -40,6 +94,12 @@ export function ResumePreview({ resumeDetails, matchedSkills }): React.JSX.Eleme
     }
 
     return updated_string;
+  }
+
+  const _container = React.createRef<HTMLDivElement>();
+
+  function _onListChange(newList: ReadonlyArray<PlanetListItem>) {
+    setList(newList);
   }
 
   return resume ? (
@@ -81,6 +141,10 @@ export function ResumePreview({ resumeDetails, matchedSkills }): React.JSX.Eleme
           </Box>
         ))}
       </Box>
+      <hr></hr>
+      <div className="list" ref={_container}>
+        <DraggableList<PlanetListItem, void, PlanetItem> itemKey="name" template={PlanetItem} list={list} onMoveEnd={(newList) => _onListChange(newList)} container={() => document.body} />
+      </div>
       <Box>
         <Box>
           <b>Skills</b>
@@ -93,9 +157,10 @@ export function ResumePreview({ resumeDetails, matchedSkills }): React.JSX.Eleme
           ))}
         </ul>
       </Box>
+      <hr></hr>
       <Box>
         <Box>
-          <Box>
+          <Box sx={{ mb: 1, mt: 1 }}>
             <b>Experience</b>
           </Box>
           <Box>
@@ -111,19 +176,37 @@ export function ResumePreview({ resumeDetails, matchedSkills }): React.JSX.Eleme
                     <Box>{experience.timeline}</Box>
                   </Grid>
                 </Box>
-                <Box sx={{ textAlign: "justify" }}>
-                  <ul>
-                    {experience.bullets.map((bullet) => (
-                      <li dangerouslySetInnerHTML={{ __html: highlight_text(bullet) }} key={bullet}></li>
-                    ))}
-                  </ul>
+                <Box className="resume-bullets" sx={{ textAlign: "justify" }}>
+                  {bulletEditStatus.state === "replace" ? (
+                    <>
+                      {experience.bullets.map((bullet, index) => (
+                        <Box key={index} sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+                          <Box component="img" alt="Widgets" src="/assets/replace.png" sx={{ height: "100%", width: "100%", maxWidth: "20px", cursor: "pointer", marginRight: 2 }} />
+                          <span dangerouslySetInnerHTML={{ __html: highlight_text(bullet) }} key={bullet}></span>
+                        </Box>
+                      ))}
+                    </>
+                  ) : (
+                    <>
+                      {experience.bullets.map((bullet) => (
+                        <p dangerouslySetInnerHTML={{ __html: highlight_text(bullet) }} key={bullet}></p>
+                      ))}
+                    </>
+                  )}
+
+                  {bulletEditStatus.state === "add" && (
+                    <Box sx={{ textAlign: "center", cursor: "pointer" }}>
+                      <Box component="img" alt="Widgets" src="/assets/section-add.png" sx={{ height: "auto", width: "100%", maxWidth: "40px", mb: 2 }} />
+                    </Box>
+                  )}
                 </Box>
               </Box>
             ))}
           </Box>
         </Box>
+        <hr></hr>
         <Box>
-          <Box>
+          <Box sx={{ mb: 1, mt: 1 }}>
             <b>Projects</b>
           </Box>
           <Box>
@@ -138,12 +221,15 @@ export function ResumePreview({ resumeDetails, matchedSkills }): React.JSX.Eleme
                     </Box>
                   </Grid>
                 </Box>
-                <Box sx={{ textAlign: "justify" }}>
-                  <ul>
-                    {project.bullets.map((bullet) => (
-                      <li dangerouslySetInnerHTML={{ __html: highlight_text(bullet) }} key={bullet}></li>
-                    ))}
-                  </ul>
+                <Box className="resume-bullets" sx={{ textAlign: "justify" }}>
+                  {project.bullets.map((bullet) => (
+                    <p dangerouslySetInnerHTML={{ __html: highlight_text(bullet) }} key={bullet}></p>
+                  ))}
+                  {(bulletEditStatus.state === "add" || bulletEditStatus.state === "replace") && (
+                    <Box sx={{ textAlign: "center", cursor: "pointer" }}>
+                      <Box component="img" alt="Widgets" src="/assets/section-add.png" sx={{ height: "auto", width: "100%", maxWidth: "40px", mb: 2 }} />
+                    </Box>
+                  )}
                 </Box>
               </Box>
             ))}

@@ -65,6 +65,7 @@ export function ResumeReview(): React.JSX.Element {
   const [selectedSkills, setSelectedSkills] = React.useState<Array<string>>([]);
   const [relevantBullets, setRelevantBullets] = React.useState<Array<string>>([]);
   const [generatedText, setGeneratedText] = React.useState({});
+  const [bulletEditStatus, setBulletEditStatus] = React.useState({ state: "", bullet: "", id: "" });
   const params = useParams();
 
   React.useEffect(() => {
@@ -122,12 +123,6 @@ export function ResumeReview(): React.JSX.Element {
     [setError, selectedSkills]
   );
 
-  function handleDelete() {}
-
-  function checkSkillSelection() {
-    return true;
-  }
-
   async function getRelevantBullets(skills, skill = "") {
     let skills_concatenated = "";
     for (let i = 0; i < skills.length; i++) {
@@ -164,6 +159,24 @@ export function ResumeReview(): React.JSX.Element {
     setSelectedSkills([...selectedSkills]);
 
     getRelevantBullets(selectedSkills);
+  };
+
+  const handleBulletClickAdd = (e) => {
+    const id = e.currentTarget.getAttribute("data-id");
+    const bullet = e.currentTarget.getAttribute("data-bullet");
+
+    setBulletEditStatus({ state: "add", bullet: bullet, id: id });
+  };
+
+  const handleBulletClickReplace = (e) => {
+    const id = e.currentTarget.getAttribute("data-id");
+    const bullet = e.currentTarget.getAttribute("data-bullet");
+
+    setBulletEditStatus({ state: "replace", bullet: bullet, id: id });
+  };
+
+  const handleBulletClickCancel = () => {
+    setBulletEditStatus({ state: "", bullet: "", id: "" });
   };
 
   function SkillChip(props: ChipProps & { label: string }) {
@@ -290,10 +303,24 @@ export function ResumeReview(): React.JSX.Element {
                                   {bullet.bullet}
                                 </TableCell>
                                 <TableCell align="right">
-                                  <ButtonGroup size="small" aria-label="Small button group">
-                                    <Button>Add</Button>
-                                    <Button>Replace</Button>
-                                  </ButtonGroup>
+                                  {String(bulletEditStatus.id) === String(bullet.id) ? (
+                                    <>
+                                      <Button size="small" variant="outlined" onClick={handleBulletClickCancel}>
+                                        Cancel
+                                      </Button>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <ButtonGroup size="small" aria-label="Small button group">
+                                        <Button data-id={bullet.id} data-value={bullet.bullet} onClick={handleBulletClickAdd}>
+                                          Add
+                                        </Button>
+                                        <Button data-id={bullet.id} data-value={bullet.bullet} onClick={handleBulletClickReplace}>
+                                          Replace
+                                        </Button>
+                                      </ButtonGroup>
+                                    </>
+                                  )}
                                 </TableCell>
                               </TableRow>
                             ))}
@@ -395,10 +422,13 @@ export function ResumeReview(): React.JSX.Element {
               flexBasis: { xs: "auto", lg: "50%" },
               justifyContent: "center",
               p: 3,
+              height: "calc(100vh - 85px)",
+              overflowY: "scroll",
+              alignItems: "flex-start",
             }}
           >
             <Stack spacing={3}>
-              <ResumePreview resumeDetails={resume} matchedSkills={jobStatsData ? jobStatsData.matched_skills : ""} />
+              <ResumePreview resumeDetails={resume} bulletEditStatus={bulletEditStatus} matchedSkills={jobStatsData ? jobStatsData.matched_skills : ""} />
             </Stack>
           </Box>
         </>
