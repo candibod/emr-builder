@@ -413,7 +413,6 @@ export function ResumeReview(): React.JSX.Element {
           </Box>
           <Box
             sx={{
-              alignItems: "center",
               margin: "10px",
               borderRadius: "30px",
               background: "white",
@@ -421,15 +420,12 @@ export function ResumeReview(): React.JSX.Element {
               display: { xs: "flex", lg: "flex" },
               flexBasis: { xs: "auto", lg: "50%" },
               justifyContent: "center",
-              p: 3,
+              p: 1,
               height: "calc(100vh - 85px)",
-              overflowY: "scroll",
               alignItems: "flex-start",
             }}
           >
-            <Stack spacing={3}>
-              <ResumePreview resumeDetails={resume} bulletEditStatus={bulletEditStatus} matchedSkills={jobStatsData ? jobStatsData.matched_skills : ""} />
-            </Stack>
+            <ResumePreview resumeDetails={resume} bulletEditStatus={bulletEditStatus} matchedSkills={jobStatsData ? jobStatsData.matched_skills : ""} />
           </Box>
         </>
       ) : (

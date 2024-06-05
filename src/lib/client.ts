@@ -169,10 +169,22 @@ export interface GenerateTextParams {
   keywords: string;
 }
 
+export interface Resume {
+  certifications: null;
+  name: string;
+  mobile_number: string;
+  email: string;
+  url: string;
+  education: Array<{ name: string; timeline: string }>;
+  skills: Array<{ category: string; skills: Array<string> }>;
+  experience: Array<{ name: string; timeline: string; bullets: Array<string> }>;
+  projects: Array<{ name: string; timeline: string; bullets: Array<string> }>;
+}
+
 export interface ResumeResponse {
   ok?: boolean;
   message?: string;
-  data?: { resume: object; matched_skills: string; unmatched_skills: string; match_percent: number; relevant_bullets: Array<string>; builder_id: string };
+  data?: { resume: Resume; matched_skills: string; unmatched_skills: string; match_percent: number; relevant_bullets: Array<string>; builder_id: string };
   errors?: object;
 }
 
