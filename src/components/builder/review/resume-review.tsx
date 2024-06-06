@@ -425,7 +425,7 @@ export function ResumeReview(): React.JSX.Element {
               alignItems: "flex-start",
             }}
           >
-            <ResumePreview resumeDetails={resume} bulletEditStatus={bulletEditStatus} matchedSkills={jobStatsData ? jobStatsData.matched_skills : ""} />
+            <ResumePreview resumeDetails={resume} bulletEditStatus={bulletEditStatus} matchedSkills={jobStatsData ? jobStatsData.matched_skills : ""} handleClickCancel={handleBulletClickCancel} />
           </Box>
         </>
       ) : (

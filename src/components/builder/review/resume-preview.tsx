@@ -7,19 +7,23 @@ import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 import Divider from "@mui/material/Divider";
+import SaveIcon from "@mui/icons-material/Save";
+import TextField from "@mui/material/TextField";
 import Grid from "@mui/material/Unstable_Grid2";
 import EditIcon from "@mui/icons-material/Edit";
 import Typography from "@mui/material/Typography";
 import CachedIcon from "@mui/icons-material/Cached";
+import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 
 import DraggableList from "react-draggable-list";
 import type { Resume } from "../../../lib/client";
 
 interface PlanetListItem {
-  name: string;
-  subtitle?: boolean;
+  id: string;
+  bullet: string;
 }
 
 interface PlanetProps {
@@ -36,6 +40,12 @@ interface ResumePreviewProps {
   resumeDetails: Resume;
   matchedSkills: string;
   bulletEditStatus: { state: string; bullet: string; id: string };
+  handleClickCancel(): any;
+}
+
+interface bulletList {
+  experience: Array<Array<{ id: string; bullet: string }>>;
+  projects: Array<Array<{ id: string; bullet: string }>>;
 }
 
 const styles = {
@@ -45,9 +55,9 @@ const styles = {
 };
 
 class PlanetItem extends React.Component<PlanetProps, PlanetState> {
-  getDragHeight() {
-    return this.props.item.subtitle ? 47 : 28;
-  }
+  // getDragHeight() {
+  //   return this.props.item.subtitle ? 47 : 28;
+  // }
 
   render() {
     const { item, itemSelected, dragHandleProps } = this.props;
@@ -66,30 +76,47 @@ class PlanetItem extends React.Component<PlanetProps, PlanetState> {
         <div className="dragHandle" {...dragHandleProps}>
           <DragIndicatorIcon />
         </div>
-        <div>{item.name}</div>
+        <div>{item.bullet}</div>
       </div>
     );
   }
 }
 
-export function ResumePreview({ resumeDetails, matchedSkills, bulletEditStatus }: ResumePreviewProps): React.JSX.Element {
+export function ResumePreview({ resumeDetails, matchedSkills, bulletEditStatus, handleClickCancel }: ResumePreviewProps): React.JSX.Element {
   const router = useRouter();
   const _container = React.createRef<HTMLDivElement>();
+  const updateLog: { [key: string]: string } = {};
   const [resume, setResume] = React.useState<Resume | undefined>(undefined);
-  const [list, setList] = React.useState<Array<PlanetListItem>>([
-    { name: "Mercury" },
-    { name: "Venus" },
-    { name: "Earth", subtitle: true },
-    { name: "Mars" },
-    { name: "Jupiter" },
-    { name: "Saturn", subtitle: true },
-    { name: "Uranus", subtitle: true },
-    { name: "Neptune" },
-  ]);
+  const [userAction, SetUserAction] = React.useState<{ state: string; bullet: string; id: string }>({ state: "", bullet: "", id: "" });
+
+  let tempBulletPointsList: bulletList = { experience: [], projects: [] };
+  resumeDetails.experience.forEach((experience, index) => {
+    tempBulletPointsList["experience"][index] = [];
+
+    for (let i = 0; i < experience.bullets.length; i++) {
+      tempBulletPointsList["experience"][index][i] = {
+        id: i.toString(),
+        bullet: experience.bullets[i],
+      };
+    }
+  });
+
+  resumeDetails.projects.forEach((project, index) => {
+    tempBulletPointsList["projects"][index] = [];
+
+    for (let i = 0; i < project.bullets.length; i++) {
+      tempBulletPointsList["projects"][index][i] = {
+        id: i.toString(),
+        bullet: project.bullets[i],
+      };
+    }
+  });
+  const [bulletPointsList, setBulletPointsList] = React.useState<bulletList>(tempBulletPointsList);
 
   React.useEffect(() => {
     setResume(resumeDetails);
-  }, [resumeDetails]);
+    SetUserAction(bulletEditStatus);
+  }, [resumeDetails, bulletEditStatus]);
 
   function get_split_element_in_string(element: string, index: number): string {
     return element.split(",")[index];
@@ -112,13 +139,34 @@ export function ResumePreview({ resumeDetails, matchedSkills, bulletEditStatus }
     return updated_string;
   }
 
-  function _onListChange(newList: ReadonlyArray<PlanetListItem>) {
+  function _onListChange(newList: ReadonlyArray<PlanetListItem>, exp_index: number) {
     const updatedList = [...newList];
-    setList(updatedList);
+    const newBulletPointsList = structuredClone(bulletPointsList);
+
+    // const newBulletPointsList = [...bulletPointsList];
+    newBulletPointsList["experience"][exp_index] = updatedList;
+    setBulletPointsList(newBulletPointsList);
+    console.log(newList);
+    console.log(newBulletPointsList);
   }
 
+  console.log("render");
+
+  function handleClickAction(action: string) {
+    SetUserAction({ state: action, bullet: "", id: "" });
+  }
+
+  function handleClickSave() {
+    console.log(updateLog);
+    console.log("send to server");
+  }
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, index: string) => {
+    updateLog[index] = event.target.value;
+  };
+
   return resume ? (
-    <Box sx={{ color: "#000", fontSize: "12px", height: "100%" }}>
+    <Box sx={{ color: "#000", fontSize: "12px", height: "100%", width: "100%" }}>
       <Box sx={{ height: "38px" }}>
         <Typography gutterBottom align="center" variant="h5" component="div">
           Resume Preview
@@ -160,9 +208,7 @@ export function ResumePreview({ resumeDetails, matchedSkills, bulletEditStatus }
           ))}
         </Box>
         <hr></hr>
-        <div className="list" ref={_container}>
-          <DraggableList<PlanetListItem, void, PlanetItem> itemKey="name" template={PlanetItem} list={list} onMoveEnd={(newList) => _onListChange(newList)} container={() => document.body} />
-        </div>
+
         <Box>
           <Box>
             <b>Skills</b>
@@ -182,7 +228,7 @@ export function ResumePreview({ resumeDetails, matchedSkills, bulletEditStatus }
               <b>Experience</b>
             </Box>
             <Box>
-              {resume.experience.map((experience) => (
+              {resume.experience.map((experience, exp_index) => (
                 <Box key={experience.name}>
                   <Box>
                     <Grid container justifyContent="space-between" direction="row">
@@ -195,7 +241,7 @@ export function ResumePreview({ resumeDetails, matchedSkills, bulletEditStatus }
                     </Grid>
                   </Box>
                   <Box className="resume-bullets" sx={{ textAlign: "justify" }}>
-                    {bulletEditStatus.state === "replace" ? (
+                    {userAction.state === "replace" && (
                       <>
                         {experience.bullets.map((bullet, index) => (
                           <Box key={index} sx={{ display: "flex", alignItems: "center", mb: 1 }}>
@@ -204,7 +250,52 @@ export function ResumePreview({ resumeDetails, matchedSkills, bulletEditStatus }
                           </Box>
                         ))}
                       </>
-                    ) : (
+                    )}
+
+                    {userAction.state === "delete" && (
+                      <>
+                        {experience.bullets.map((bullet, index) => (
+                          <Box key={index} sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+                            <DeleteOutlineIcon color="error" sx={{ height: "100%", width: "100%", maxWidth: "20px", cursor: "pointer", marginRight: "10px" }} />
+                            <span dangerouslySetInnerHTML={{ __html: highlight_text(bullet) }} key={bullet}></span>
+                          </Box>
+                        ))}
+                      </>
+                    )}
+
+                    {userAction.state === "edit" && (
+                      <Box component="form" noValidate autoComplete="off">
+                        {experience.bullets.map((bullet, index) => (
+                          <TextField
+                            hiddenLabel
+                            fullWidth
+                            size="small"
+                            margin="dense"
+                            variant="outlined"
+                            key={index}
+                            placeholder="Please enter a bullet point"
+                            InputLabelProps={{ shrink: false }}
+                            defaultValue={bullet}
+                            onChange={(e) => handleChange(e, "exp_" + exp_index + "_" + index)}
+                            inputProps={{ style: { fontSize: "13px" } }}
+                          />
+                        ))}
+                      </Box>
+                    )}
+
+                    {userAction.state === "reorder" && (
+                      <Box component="div" ref={_container} sx={{ mt: 1 }}>
+                        <DraggableList<PlanetListItem, void, PlanetItem>
+                          itemKey="id"
+                          template={PlanetItem}
+                          list={bulletPointsList["experience"][exp_index]}
+                          onMoveEnd={(newList) => _onListChange(newList, exp_index)}
+                          container={() => document.body}
+                        />
+                      </Box>
+                    )}
+
+                    {(userAction.state === "add" || userAction.state === "") && (
                       <>
                         {experience.bullets.map((bullet) => (
                           <p dangerouslySetInnerHTML={{ __html: highlight_text(bullet) }} key={bullet}></p>
@@ -212,7 +303,7 @@ export function ResumePreview({ resumeDetails, matchedSkills, bulletEditStatus }
                       </>
                     )}
 
-                    {bulletEditStatus.state === "add" && (
+                    {userAction.state === "add" && (
                       <Box sx={{ textAlign: "center", cursor: "pointer" }}>
                         <Box component="img" alt="Widgets" src="/assets/section-add.png" sx={{ height: "auto", width: "100%", maxWidth: "40px", mb: 2 }} />
                       </Box>
@@ -243,7 +334,7 @@ export function ResumePreview({ resumeDetails, matchedSkills, bulletEditStatus }
                     {project.bullets.map((bullet) => (
                       <p dangerouslySetInnerHTML={{ __html: highlight_text(bullet) }} key={bullet}></p>
                     ))}
-                    {(bulletEditStatus.state === "add" || bulletEditStatus.state === "replace") && (
+                    {(userAction.state === "add" || userAction.state === "replace") && (
                       <Box sx={{ textAlign: "center", cursor: "pointer" }}>
                         <Box component="img" alt="Widgets" src="/assets/section-add.png" sx={{ height: "auto", width: "100%", maxWidth: "40px", mb: 2 }} />
                       </Box>
@@ -258,15 +349,34 @@ export function ResumePreview({ resumeDetails, matchedSkills, bulletEditStatus }
       <Box component="div" sx={{ backgroundColor: "white", borderRadius: "30px" }}>
         <Divider />
         <Stack spacing={2} direction="row" sx={{ p: 1 }} justifyContent="center">
-          <Button variant="contained" startIcon={<EditIcon />}>
-            Edit
-          </Button>
-          <Button variant="contained" startIcon={<CachedIcon />}>
-            Re-Order
-          </Button>
-          <Button variant="contained" startIcon={<DeleteOutlineIcon />}>
-            Delete
-          </Button>
+          {(userAction.state === "add" || userAction.state === "replace") && (
+            <Button variant="contained" onClick={handleClickCancel} startIcon={<HighlightOffIcon />}>
+              Cancel
+            </Button>
+          )}
+          {(userAction.state === "delete" || userAction.state === "reorder") && (
+            <Button variant="contained" onClick={handleClickCancel} startIcon={<CheckCircleOutlineIcon />}>
+              Done
+            </Button>
+          )}
+          {userAction.state === "edit" && (
+            <Button variant="contained" onClick={handleClickSave} startIcon={<SaveIcon />}>
+              Save
+            </Button>
+          )}
+          {userAction.state === "" && (
+            <>
+              <Button variant="contained" onClick={() => handleClickAction("edit")} startIcon={<EditIcon />}>
+                Edit
+              </Button>
+              <Button variant="contained" onClick={() => handleClickAction("reorder")} startIcon={<CachedIcon />}>
+                Re-Order
+              </Button>
+              <Button variant="contained" onClick={() => handleClickAction("delete")} startIcon={<DeleteOutlineIcon />}>
+                Delete
+              </Button>
+            </>
+          )}
         </Stack>
       </Box>
     </Box>
