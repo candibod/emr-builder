@@ -3,50 +3,39 @@
 import * as React from "react";
 
 import Box from "@mui/material/Box";
+import Card from "@mui/material/Card";
+import Paper from "@mui/material/Paper";
+import Table from "@mui/material/Table";
 import Stack from "@mui/material/Stack";
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
-import Select from "@mui/material/Select";
-import MenuItem from "@mui/material/MenuItem";
-import Typography from "@mui/material/Typography";
-import InputLabel from "@mui/material/InputLabel";
-import FormControl from "@mui/material/FormControl";
-import OutlinedInput from "@mui/material/OutlinedInput";
-import FormHelperText from "@mui/material/FormHelperText";
-import Chip, { ChipProps } from "@mui/material/Chip";
-import ButtonGroup from "@mui/material/ButtonGroup";
-import { TextareaAutosize as BaseTextareaAutosize } from "@mui/base/TextareaAutosize";
-import { styled } from "@mui/system";
 import Divider from "@mui/material/Divider";
-import { useParams } from "next/navigation";
-
-import Table from "@mui/material/Table";
+import TableRow from "@mui/material/TableRow";
+import Backdrop from "@mui/material/Backdrop";
+import TableHead from "@mui/material/TableHead";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
+import Grid from "@mui/material/Unstable_Grid2";
+import Typography from "@mui/material/Typography";
+import InputLabel from "@mui/material/InputLabel";
+import CardContent from "@mui/material/CardContent";
+import FormControl from "@mui/material/FormControl";
+import ButtonGroup from "@mui/material/ButtonGroup";
+import Chip, { ChipProps } from "@mui/material/Chip";
+import OutlinedInput from "@mui/material/OutlinedInput";
+import FormHelperText from "@mui/material/FormHelperText";
 import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
-import IconButton from "@mui/material/IconButton";
-import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit";
-import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
+import HighlightOffIcon from "@mui/icons-material/HighlightOff";
+import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
+
 import { z as zod } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
-import TextField from "@mui/material/TextField";
-import Card from "@mui/material/Card";
-import CardHeader from "@mui/material/CardHeader";
-import CardMedia from "@mui/material/CardMedia";
-import CardContent from "@mui/material/CardContent";
-import Grid from "@mui/material/Unstable_Grid2";
-import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
+
+import { useParams } from "next/navigation";
 import { resumeClient } from "../../../lib/client";
-import CustomTextArea from "../../../lib/textarea";
 import { ResumePreview } from "../review/resume-preview";
-import AdjustIcon from "@mui/icons-material/Adjust";
-import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 
 const schema = zod.object({
   experience: zod.string().min(6, { message: "Experience is required, min length: 6" }),

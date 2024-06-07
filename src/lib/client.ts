@@ -83,6 +83,44 @@ async function apiRequestHandler(url: string, method: string, body?: object, hea
   return api_response;
 }
 
+async function apiFileRequestHandler(url: string, method: string, body?: object, headers?: object) {
+  const response = await fetch(process.env.NEXT_PUBLIC_API_HOST_URL + url, {
+    method: method,
+    credentials: "include",
+    body: body,
+  });
+
+  let api_response = {
+    ok: false,
+    message: "An Error Occurred!, Please try again",
+    data: {},
+    errors: {},
+  };
+
+  if (!response.ok) {
+    return response.json().then((res: ErrorResponse) => {
+      api_response["message"] = "Something went wrong, Please reload the page and try again.";
+
+      if (res.message) {
+        api_response["message"] = res.message;
+      }
+      if (res.errors) {
+        api_response["errors"] = res.errors;
+      }
+
+      return api_response;
+    });
+  }
+
+  const res = await response.json();
+
+  api_response["ok"] = true;
+  api_response["message"] = res.message;
+  api_response["data"] = res.data;
+
+  return api_response;
+}
+
 class AuthClient {
   async signUp(_: SignUpParams): Promise<{ error?: string }> {
     // Make API request
@@ -189,6 +227,26 @@ export interface ResumeResponse {
 }
 
 class ResumeClient {
+  async uploadResume(params: { file: Blob; role: string }): Promise<{ data?: ApiResponse; error?: string }> {
+    const { file, role } = params;
+
+    const formData = new FormData();
+    formData.append("resume", file);
+    formData.append("job_role", role);
+
+    return apiFileRequestHandler("resume/uploads", "POST", formData)
+      .then((response) => {
+        if (response.ok) {
+          return { data: response.data };
+        } else {
+          return { error: response.message };
+        }
+      })
+      .catch((error) => {
+        return { error: error.message };
+      });
+  }
+
   async getMatchStats(params: GetMatchStatsParams): Promise<{ data?: ApiResponse; error?: string }> {
     const { job_description, job_role, job_url, company_name } = params;
 
