@@ -90,7 +90,10 @@ export function ResumeReviews(): React.JSX.Element {
                     </Stack>
                   </TableCell>
                   <TableCell component="th" scope="row">
-                    {row.company_name} - {"(" + row.job_url + ")"}
+                    {row.company_name} -
+                    <a href={row.job_url}>
+                      <div style={{ overflow: "hidden", textOverflow: "ellipsis", width: "11rem", whiteSpace: "nowrap" }}>{"(" + row.job_url + ")"}</div>
+                    </a>
                   </TableCell>
                   <TableCell align="right">{row.job_role}</TableCell>
                   <TableCell align="right">{row.match_percentage}</TableCell>

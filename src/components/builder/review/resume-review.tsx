@@ -34,6 +34,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 
 import { useParams } from "next/navigation";
+import type { Resume, JobStatsData, EditResumeParams } from "../../../lib/client";
 import { resumeClient } from "../../../lib/client";
 import { ResumePreview } from "../review/resume-preview";
 
@@ -49,36 +50,36 @@ const defaultValues = { experience: "", activity: "", result: "" } satisfies Val
 
 export function ResumeReview(): React.JSX.Element {
   const [isPending, setIsPending] = React.useState<boolean>(true);
-  const [jobStatsData, setJobStatsData] = React.useState({});
-  const [resume, setResume] = React.useState();
+  const [jobStatsData, setJobStatsData] = React.useState<JobStatsData | undefined>(undefined);
+  const [resume, setResume] = React.useState<Resume | undefined>();
   const [selectedSkills, setSelectedSkills] = React.useState<Array<string>>([]);
   const [relevantBullets, setRelevantBullets] = React.useState<Array<string>>([]);
   const [generatedText, setGeneratedText] = React.useState({});
   const [bulletEditStatus, setBulletEditStatus] = React.useState({ state: "", bullet: "", id: "" });
   const params = useParams();
+  const { slug } = params;
 
-  React.useEffect(() => {
-    async function fetchMyAPI() {
-      setIsPending(true);
-      const { slug } = params;
-      if (slug !== undefined) {
-        const { data, error } = await resumeClient.getResumeReview(slug);
+  async function fetchMyAPI() {
+    setIsPending(true);
+    if (slug !== undefined) {
+      const { data, error } = await resumeClient.getResumeReview(slug);
 
-        if (error) {
-          console.log("error", error);
-          setIsPending(false);
-          return;
-        }
+      if (error) {
+        console.log("error", error);
+        setIsPending(false);
+        return;
+      }
 
-        console.log(data);
-        if (data) {
-          setIsPending(false);
-          setJobStatsData(data);
-          setResume(data.resume);
-        }
+      console.log(data);
+      if (data) {
+        setIsPending(false);
+        setJobStatsData(data);
+        setResume(data.resume);
       }
     }
+  }
 
+  React.useEffect(() => {
     fetchMyAPI();
   }, []);
 
@@ -147,7 +148,9 @@ export function ResumeReview(): React.JSX.Element {
     selectedSkills.splice(index, 1);
     setSelectedSkills([...selectedSkills]);
 
-    getRelevantBullets(selectedSkills);
+    if (selectedSkills.length > 0) {
+      getRelevantBullets(selectedSkills);
+    }
   };
 
   const handleBulletClickAdd = (e) => {
@@ -164,8 +167,48 @@ export function ResumeReview(): React.JSX.Element {
     setBulletEditStatus({ state: "replace", bullet: bullet, id: id });
   };
 
-  const handleBulletClickCancel = () => {
+  const handleBulletClickCancel = (action: string = "") => {
     setBulletEditStatus({ state: "", bullet: "", id: "" });
+
+    if (action === "delete") {
+      fetchMyAPI();
+    }
+  };
+
+  async function updateResume(action: string, resume_data: any, is_resume_data_update: boolean = false) {
+    setIsPending(true);
+    const { data, error } = await resumeClient.updateResume(slug[0], action, resume_data);
+
+    if (error) {
+      console.log("error", error);
+      setIsPending(false);
+      window.alert(error);
+      return;
+    }
+
+    if (data) {
+      setIsPending(false);
+      console.log(data);
+      if (is_resume_data_update) {
+        setJobStatsData(data);
+        setResume(data.resume);
+      }
+    }
+  }
+
+  const handleEditAction = (action: string, index: string) => {
+    console.log(action, index, bulletEditStatus);
+
+    if (action === "add" && bulletEditStatus.state === "add") {
+      console.log("add action");
+      updateResume("add", { index: index, bullet_id: bulletEditStatus.id }, true);
+      setBulletEditStatus({ state: "", bullet: "", id: "" });
+    } else if (action === "delete") {
+      console.log("delete action");
+      updateResume("delete", { index: index });
+    } else {
+      window.alert("Something went wrong, Please reload the page and try again");
+    }
   };
 
   function SkillChip(props: ChipProps & { label: string }) {
@@ -191,7 +234,7 @@ export function ResumeReview(): React.JSX.Element {
         minHeight: "100%",
       }}
     >
-      {Object.keys(jobStatsData).length > 0 ? (
+      {jobStatsData ? (
         <>
           <Box
             sx={{
@@ -207,10 +250,10 @@ export function ResumeReview(): React.JSX.Element {
                 <Grid container justifyContent="space-between" direction="row">
                   <Box>
                     <Typography component="div" variant="h5">
-                      {jobStatsData && jobStatsData.job_company ? jobStatsData.job_company : "Company"}
+                      {jobStatsData && jobStatsData.company_name ? jobStatsData.company_name : "Company"}
                     </Typography>
                     <Typography variant="subtitle1" color="text.secondary" component="div">
-                      {jobStatsData && jobStatsData.job_role}
+                      {jobStatsData && jobStatsData.company_role}
                     </Typography>
                   </Box>
                   <Box>
@@ -414,7 +457,14 @@ export function ResumeReview(): React.JSX.Element {
               alignItems: "flex-start",
             }}
           >
-            <ResumePreview resumeDetails={resume} bulletEditStatus={bulletEditStatus} matchedSkills={jobStatsData ? jobStatsData.matched_skills : ""} handleClickCancel={handleBulletClickCancel} />
+            <ResumePreview
+              resumeDetails={resume}
+              bulletEditStatus={bulletEditStatus}
+              matchedSkills={jobStatsData ? jobStatsData.matched_skills : ""}
+              handleEditAction={(action, index) => handleEditAction(action, index)}
+              handleClickCancel={handleBulletClickCancel}
+              setIsPending={setIsPending}
+            />
           </Box>
         </>
       ) : (

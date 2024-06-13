@@ -35,6 +35,31 @@ export interface ErrorResponse {
   detail?: object;
 }
 
+export interface Resume {
+  certifications: null;
+  name: string;
+  mobile_number: string;
+  email: string;
+  url: string;
+  education: Array<{ name: string; timeline: string }>;
+  skills: Array<{ category: string; skills: Array<string> }>;
+  experience: Array<{ name: string; timeline: string; bullets: Array<string> }>;
+  projects: Array<{ name: string; timeline: string; bullets: Array<string> }>;
+}
+
+export interface JobStatsData {
+  builder_id: string;
+  company_name: string;
+  company_role: string;
+  job_description: string;
+  job_role: string;
+  job_url: string;
+  match_percent: number;
+  matched_skills: string;
+  unmatched_skills: string;
+  resume: Resume;
+}
+
 export interface ApiResponse {
   ok?: boolean;
   message?: string;
@@ -42,7 +67,7 @@ export interface ApiResponse {
   errors?: object;
 }
 
-async function apiRequestHandler(url: string, method: string, body?: object, headers?: object) {
+async function apiRequestHandler(url: string, method: string, body?: object, headers?: object): Promise<ApiResponse> {
   const response = await fetch(process.env.NEXT_PUBLIC_API_HOST_URL + url, {
     method: method,
     headers: {
@@ -207,16 +232,9 @@ export interface GenerateTextParams {
   keywords: string;
 }
 
-export interface Resume {
-  certifications: null;
-  name: string;
-  mobile_number: string;
-  email: string;
-  url: string;
-  education: Array<{ name: string; timeline: string }>;
-  skills: Array<{ category: string; skills: Array<string> }>;
-  experience: Array<{ name: string; timeline: string; bullets: Array<string> }>;
-  projects: Array<{ name: string; timeline: string; bullets: Array<string> }>;
+export interface EditResumeParams {
+  index?: string;
+  bullet_id?: string;
 }
 
 export interface ResumeResponse {
@@ -307,7 +325,7 @@ class ResumeClient {
       });
   }
 
-  async getRelevantBullets(skills_concatenated: string): Promise<{ data?: ResumeResponse; error?: string }> {
+  async getRelevantBullets(skills_concatenated: string): Promise<{ data?: ApiResponse; error?: string }> {
     return apiRequestHandler("resume/relevant-bullets", "POST", { skills: skills_concatenated })
       .then((response) => {
         if (response.ok) {
@@ -321,7 +339,24 @@ class ResumeClient {
       });
   }
 
-  async generateText(params: GenerateTextParams): Promise<{ data?: ResumeResponse; error?: string }> {
+  async updateResume(builder_uuid: string, action: string, resume_data: EditResumeParams): Promise<{ data?: ApiResponse; error?: string }> {
+    console.log("params", action, resume_data);
+    const payload = { builder_uuid: builder_uuid, action: action, action_data: { index: resume_data.index, bullet_id: resume_data.bullet_id } };
+
+    return apiRequestHandler("resume/update-resume", "POST", payload)
+      .then((response) => {
+        if (response.ok) {
+          return { data: response.data };
+        } else {
+          return { error: response.message };
+        }
+      })
+      .catch((error) => {
+        return { error: error.message };
+      });
+  }
+
+  async generateText(params: GenerateTextParams): Promise<{ data?: ApiResponse; error?: string }> {
     const { experience, activity, result, keywords } = params;
 
     return apiRequestHandler("resume/generate-text", "POST", { experience: experience, activity: activity, result: result, skills: keywords })

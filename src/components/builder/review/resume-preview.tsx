@@ -37,10 +37,12 @@ interface PlanetState {
 }
 
 interface ResumePreviewProps {
-  resumeDetails: Resume;
+  resumeDetails: Resume | undefined;
   matchedSkills: string;
   bulletEditStatus: { state: string; bullet: string; id: string };
-  handleClickCancel(): any;
+  handleClickCancel(action: string): any;
+  handleEditAction(action: string, index: string): any;
+  setIsPending(action: boolean): any;
 }
 
 interface bulletList {
@@ -82,7 +84,7 @@ class PlanetItem extends React.Component<PlanetProps, PlanetState> {
   }
 }
 
-export function ResumePreview({ resumeDetails, matchedSkills, bulletEditStatus, handleClickCancel }: ResumePreviewProps): React.JSX.Element {
+export function ResumePreview({ resumeDetails, matchedSkills, bulletEditStatus, handleClickCancel, handleEditAction, setIsPending }: ResumePreviewProps): React.JSX.Element {
   const router = useRouter();
   const _container = React.createRef<HTMLDivElement>();
   const updateLog: { [key: string]: string } = {};
@@ -90,27 +92,29 @@ export function ResumePreview({ resumeDetails, matchedSkills, bulletEditStatus, 
   const [userAction, SetUserAction] = React.useState<{ state: string; bullet: string; id: string }>({ state: "", bullet: "", id: "" });
 
   let tempBulletPointsList: bulletList = { experience: [], projects: [] };
-  resumeDetails.experience.forEach((experience, index) => {
-    tempBulletPointsList["experience"][index] = [];
+  if (resumeDetails) {
+    resumeDetails.experience.forEach((experience, index) => {
+      tempBulletPointsList["experience"][index] = [];
 
-    for (let i = 0; i < experience.bullets.length; i++) {
-      tempBulletPointsList["experience"][index][i] = {
-        id: i.toString(),
-        bullet: experience.bullets[i],
-      };
-    }
-  });
+      for (let i = 0; i < experience.bullets.length; i++) {
+        tempBulletPointsList["experience"][index][i] = {
+          id: i.toString(),
+          bullet: experience.bullets[i],
+        };
+      }
+    });
 
-  resumeDetails.projects.forEach((project, index) => {
-    tempBulletPointsList["projects"][index] = [];
+    resumeDetails.projects.forEach((project, index) => {
+      tempBulletPointsList["projects"][index] = [];
 
-    for (let i = 0; i < project.bullets.length; i++) {
-      tempBulletPointsList["projects"][index][i] = {
-        id: i.toString(),
-        bullet: project.bullets[i],
-      };
-    }
-  });
+      for (let i = 0; i < project.bullets.length; i++) {
+        tempBulletPointsList["projects"][index][i] = {
+          id: i.toString(),
+          bullet: project.bullets[i],
+        };
+      }
+    });
+  }
   const [bulletPointsList, setBulletPointsList] = React.useState<bulletList>(tempBulletPointsList);
 
   React.useEffect(() => {
@@ -143,7 +147,6 @@ export function ResumePreview({ resumeDetails, matchedSkills, bulletEditStatus, 
     const updatedList = [...newList];
     const newBulletPointsList = structuredClone(bulletPointsList);
 
-    // const newBulletPointsList = [...bulletPointsList];
     newBulletPointsList["experience"][exp_index] = updatedList;
     setBulletPointsList(newBulletPointsList);
     console.log(newList);
@@ -159,6 +162,25 @@ export function ResumePreview({ resumeDetails, matchedSkills, bulletEditStatus, 
   function handleClickSave() {
     console.log(updateLog);
     console.log("send to server");
+  }
+
+  function handleAddBullet(e: React.MouseEvent<HTMLDivElement>, index: string) {
+    handleEditAction("add", index);
+  }
+
+  function handleDeleteBullet(e: React.MouseEvent<SVGSVGElement>, category: string, category_id: number, bullet_id: number) {
+    if (category === "exp") {
+      let updatedList = resume?.experience[category_id]["bullets"];
+      updatedList?.splice(bullet_id, 1);
+
+      let updatedResume = structuredClone(resume);
+      if (updatedList && updatedResume) {
+        updatedResume.experience[category_id]["bullets"] = updatedList;
+
+        setResume(updatedResume);
+      }
+    }
+    handleEditAction("delete", category + "_" + category_id + "_" + bullet_id);
   }
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, index: string) => {
@@ -256,7 +278,11 @@ export function ResumePreview({ resumeDetails, matchedSkills, bulletEditStatus, 
                       <>
                         {experience.bullets.map((bullet, index) => (
                           <Box key={index} sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-                            <DeleteOutlineIcon color="error" sx={{ height: "100%", width: "100%", maxWidth: "20px", cursor: "pointer", marginRight: "10px" }} />
+                            <DeleteOutlineIcon
+                              color="error"
+                              onClick={(e) => handleDeleteBullet(e, "exp", exp_index, index)}
+                              sx={{ height: "100%", width: "100%", maxWidth: "20px", cursor: "pointer", marginRight: "10px" }}
+                            />
                             <span dangerouslySetInnerHTML={{ __html: highlight_text(bullet) }} key={bullet}></span>
                           </Box>
                         ))}
@@ -304,7 +330,7 @@ export function ResumePreview({ resumeDetails, matchedSkills, bulletEditStatus, 
                     )}
 
                     {userAction.state === "add" && (
-                      <Box sx={{ textAlign: "center", cursor: "pointer" }}>
+                      <Box sx={{ textAlign: "center", cursor: "pointer" }} onClick={(e) => handleAddBullet(e, "exp_" + exp_index)}>
                         <Box component="img" alt="Widgets" src="/assets/section-add.png" sx={{ height: "auto", width: "100%", maxWidth: "40px", mb: 2 }} />
                       </Box>
                     )}
@@ -319,7 +345,7 @@ export function ResumePreview({ resumeDetails, matchedSkills, bulletEditStatus, 
               <b>Projects</b>
             </Box>
             <Box>
-              {resume.projects.map((project) => (
+              {resume.projects.map((project, proj_index) => (
                 <Box key={project.name}>
                   <Box>
                     <Grid container justifyContent="space-between" direction="row">
@@ -331,11 +357,16 @@ export function ResumePreview({ resumeDetails, matchedSkills, bulletEditStatus, 
                     </Grid>
                   </Box>
                   <Box className="resume-bullets" sx={{ textAlign: "justify" }}>
-                    {project.bullets.map((bullet) => (
-                      <p dangerouslySetInnerHTML={{ __html: highlight_text(bullet) }} key={bullet}></p>
-                    ))}
-                    {(userAction.state === "add" || userAction.state === "replace") && (
-                      <Box sx={{ textAlign: "center", cursor: "pointer" }}>
+                    {(userAction.state === "add" || userAction.state === "") && (
+                      <>
+                        {project.bullets.map((bullet) => (
+                          <p dangerouslySetInnerHTML={{ __html: highlight_text(bullet) }} key={bullet}></p>
+                        ))}
+                      </>
+                    )}
+
+                    {userAction.state === "add" && (
+                      <Box sx={{ textAlign: "center", cursor: "pointer" }} onClick={(e) => handleAddBullet(e, "proj_" + proj_index)}>
                         <Box component="img" alt="Widgets" src="/assets/section-add.png" sx={{ height: "auto", width: "100%", maxWidth: "40px", mb: 2 }} />
                       </Box>
                     )}
@@ -350,13 +381,18 @@ export function ResumePreview({ resumeDetails, matchedSkills, bulletEditStatus, 
         <Divider />
         <Stack spacing={2} direction="row" sx={{ p: 1 }} justifyContent="center">
           {(userAction.state === "add" || userAction.state === "replace") && (
-            <Button variant="contained" onClick={handleClickCancel} startIcon={<HighlightOffIcon />}>
+            <Button variant="contained" onClick={() => handleClickCancel("")} startIcon={<HighlightOffIcon />}>
               Cancel
             </Button>
           )}
-          {(userAction.state === "delete" || userAction.state === "reorder") && (
-            <Button variant="contained" onClick={handleClickCancel} startIcon={<CheckCircleOutlineIcon />}>
-              Done
+          {userAction.state === "delete" && (
+            <Button variant="contained" onClick={() => handleClickCancel("delete")} startIcon={<CheckCircleOutlineIcon />}>
+              Save
+            </Button>
+          )}
+          {userAction.state === "reorder" && (
+            <Button variant="contained" onClick={() => handleClickCancel("reorder")} startIcon={<CheckCircleOutlineIcon />}>
+              Save
             </Button>
           )}
           {userAction.state === "edit" && (
