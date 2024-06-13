@@ -235,6 +235,7 @@ export interface GenerateTextParams {
 export interface EditResumeParams {
   index?: string;
   bullet_id?: string;
+  data?: any;
 }
 
 export interface ResumeResponse {
@@ -341,7 +342,7 @@ class ResumeClient {
 
   async updateResume(builder_uuid: string, action: string, resume_data: EditResumeParams): Promise<{ data?: ApiResponse; error?: string }> {
     console.log("params", action, resume_data);
-    const payload = { builder_uuid: builder_uuid, action: action, action_data: { index: resume_data.index, bullet_id: resume_data.bullet_id } };
+    const payload = { builder_uuid: builder_uuid, action: action, action_data: { index: resume_data.index, bullet_id: resume_data.bullet_id, data: resume_data.data } };
 
     return apiRequestHandler("resume/update-resume", "POST", payload)
       .then((response) => {

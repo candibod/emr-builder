@@ -189,22 +189,26 @@ export function ResumeReview(): React.JSX.Element {
     if (data) {
       setIsPending(false);
       console.log(data);
-      if (is_resume_data_update) {
-        setJobStatsData(data);
-        setResume(data.resume);
-      }
+      setBulletEditStatus({ state: "", bullet: "", id: "" });
+      setJobStatsData(data);
+      setResume(data.resume);
     }
   }
 
-  const handleEditAction = (action: string, index: string) => {
+  const handleEditAction = (action: string, index: string, data: any = {}) => {
     console.log(action, index, bulletEditStatus);
 
     if (action === "add" && bulletEditStatus.state === "add") {
-      console.log("add action");
-      updateResume("add", { index: index, bullet_id: bulletEditStatus.id }, true);
-      setBulletEditStatus({ state: "", bullet: "", id: "" });
+      updateResume("add", { index: index, bullet_id: bulletEditStatus.id });
+    } else if (action === "replace") {
+      updateResume("replace", { index: index, bullet_id: bulletEditStatus.id });
+    } else if (action === "edit") {
+      if (Object.keys(data).length > 0) {
+        updateResume("edit", { data: data });
+      } else {
+        setBulletEditStatus({ state: "", bullet: "", id: "" });
+      }
     } else if (action === "delete") {
-      console.log("delete action");
       updateResume("delete", { index: index });
     } else {
       window.alert("Something went wrong, Please reload the page and try again");
@@ -461,7 +465,7 @@ export function ResumeReview(): React.JSX.Element {
               resumeDetails={resume}
               bulletEditStatus={bulletEditStatus}
               matchedSkills={jobStatsData ? jobStatsData.matched_skills : ""}
-              handleEditAction={(action, index) => handleEditAction(action, index)}
+              handleEditAction={(action, index, any) => handleEditAction(action, index, any)}
               handleClickCancel={handleBulletClickCancel}
               setIsPending={setIsPending}
             />

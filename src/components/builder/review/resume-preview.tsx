@@ -41,7 +41,7 @@ interface ResumePreviewProps {
   matchedSkills: string;
   bulletEditStatus: { state: string; bullet: string; id: string };
   handleClickCancel(action: string): any;
-  handleEditAction(action: string, index: string): any;
+  handleEditAction(action: string, index: string, data?: any): any;
   setIsPending(action: boolean): any;
 }
 
@@ -87,7 +87,7 @@ class PlanetItem extends React.Component<PlanetProps, PlanetState> {
 export function ResumePreview({ resumeDetails, matchedSkills, bulletEditStatus, handleClickCancel, handleEditAction, setIsPending }: ResumePreviewProps): React.JSX.Element {
   const router = useRouter();
   const _container = React.createRef<HTMLDivElement>();
-  const updateLog: { [key: string]: string } = {};
+  const [updateLog, setUpdateLog] = React.useState<any>({});
   const [resume, setResume] = React.useState<Resume | undefined>(undefined);
   const [userAction, SetUserAction] = React.useState<{ state: string; bullet: string; id: string }>({ state: "", bullet: "", id: "" });
 
@@ -159,13 +159,12 @@ export function ResumePreview({ resumeDetails, matchedSkills, bulletEditStatus, 
     SetUserAction({ state: action, bullet: "", id: "" });
   }
 
-  function handleClickSave() {
-    console.log(updateLog);
-    console.log("send to server");
-  }
-
   function handleAddBullet(e: React.MouseEvent<HTMLDivElement>, index: string) {
     handleEditAction("add", index);
+  }
+
+  function handleReplaceBullet(e: React.MouseEvent<HTMLDivElement>, index: string) {
+    handleEditAction("replace", index);
   }
 
   function handleDeleteBullet(e: React.MouseEvent<SVGSVGElement>, category: string, category_id: number, bullet_id: number) {
@@ -183,7 +182,12 @@ export function ResumePreview({ resumeDetails, matchedSkills, bulletEditStatus, 
     handleEditAction("delete", category + "_" + category_id + "_" + bullet_id);
   }
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, index: string) => {
+  function handleClickSave() {
+    setUpdateLog(updateLog);
+    handleEditAction("edit", "", updateLog);
+  }
+
+  const handleEditInput = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, index: string) => {
     updateLog[index] = event.target.value;
   };
 
@@ -266,7 +270,7 @@ export function ResumePreview({ resumeDetails, matchedSkills, bulletEditStatus, 
                     {userAction.state === "replace" && (
                       <>
                         {experience.bullets.map((bullet, index) => (
-                          <Box key={index} sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+                          <Box key={index} sx={{ display: "flex", alignItems: "center", mb: 1, cursor: "pointer" }} onClick={(e) => handleReplaceBullet(e, "exp_" + exp_index + "_" + index)}>
                             <Box component="img" alt="Widgets" src="/assets/replace.png" sx={{ height: "100%", width: "100%", maxWidth: "20px", cursor: "pointer", marginRight: 2 }} />
                             <span dangerouslySetInnerHTML={{ __html: highlight_text(bullet) }} key={bullet}></span>
                           </Box>
@@ -302,7 +306,7 @@ export function ResumePreview({ resumeDetails, matchedSkills, bulletEditStatus, 
                             placeholder="Please enter a bullet point"
                             InputLabelProps={{ shrink: false }}
                             defaultValue={bullet}
-                            onChange={(e) => handleChange(e, "exp_" + exp_index + "_" + index)}
+                            onChange={(e) => handleEditInput(e, "exp_" + exp_index + "_" + index)}
                             inputProps={{ style: { fontSize: "13px" } }}
                           />
                         ))}
