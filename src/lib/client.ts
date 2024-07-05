@@ -9,19 +9,20 @@ function generateToken(): string {
 }
 
 export interface SignUpParams {
-  firstName: string;
-  lastName: string;
+  fullName: string;
   email: string;
   password: string;
-}
-
-export interface SignInWithOAuthParams {
-  provider: "google" | "discord";
 }
 
 export interface SignInWithPasswordParams {
   email: string;
   password: string;
+}
+
+export interface VerifyEmailParams {
+  mode: string;
+  oobCode: string;
+  apiKey: string;
 }
 
 export interface ResetPasswordParams {
@@ -147,24 +148,44 @@ async function apiFileRequestHandler(url: string, method: string, body?: object,
 }
 
 class AuthClient {
-  async signUp(_: SignUpParams): Promise<{ error?: string }> {
-    // Make API request
+  async signUp(params: SignUpParams): Promise<{ error?: string }> {
+    const { fullName, email, password } = params;
 
-    // We do not handle the API, so we'll just generate a token and store it in localStorage.
-    const token = generateToken();
-    localStorage.setItem("emr-auth-token", token);
-
-    return {};
-  }
-
-  async signInWithOAuth(_: SignInWithOAuthParams): Promise<{ error?: string }> {
-    return { error: "Social authentication not implemented" };
+    return apiRequestHandler("auth/signup", "POST", { name: fullName, email: email, password: password })
+      .then((response) => {
+        if (response.ok) {
+          return {};
+        } else {
+          return { error: response.message };
+        }
+      })
+      .catch((error) => {
+        return { error: error.message };
+      });
   }
 
   async signInWithPassword(params: SignInWithPasswordParams): Promise<{ error?: string }> {
     const { email, password } = params;
 
     return apiRequestHandler("auth/signin", "POST", { email: email, password: password })
+      .then((response) => {
+        if (response.ok) {
+          const token = generateToken();
+          localStorage.setItem("emr-auth-token", token);
+          return {};
+        } else {
+          return { error: response.message };
+        }
+      })
+      .catch((error) => {
+        return { error: error.message };
+      });
+  }
+
+  async verifyEmail(params: VerifyEmailParams): Promise<{ error?: string }> {
+    const { mode, oobCode, apiKey } = params;
+
+    return apiRequestHandler("auth/action", "POST", { mode: mode, oobCode: oobCode, apiKey: apiKey })
       .then((response) => {
         if (response.ok) {
           const token = generateToken();
@@ -374,5 +395,22 @@ class ResumeClient {
   }
 }
 
+class ScraperClient {
+  async getJobs(): Promise<{ data?: ApiResponse; error?: string }> {
+    return apiRequestHandler("scraper/jobs", "GET")
+      .then((response) => {
+        if (response.ok) {
+          return { data: response.data };
+        } else {
+          return { error: response.message };
+        }
+      })
+      .catch((error) => {
+        return { error: error.message };
+      });
+  }
+}
+
 export const authClient = new AuthClient();
 export const resumeClient = new ResumeClient();
+export const scraperClient = new ScraperClient();

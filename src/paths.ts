@@ -15,5 +15,8 @@ export const paths = {
     uploadResume: "/builder/upload-resume",
     account: "/builder/account",
   },
+  scraper: {
+    jobs: "/scraper/jobs",
+  },
   errors: { notFound: "/errors/not-found" },
 } as const;
