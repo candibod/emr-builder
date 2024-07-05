@@ -153,7 +153,6 @@ export function SignUpForm(): React.JSX.Element {
               {errors.root.message}
             </Alert>
           ) : null}
-
           {displaySuccessMessage && <Alert severity="success">Thanks for signing up, We have sent an email to verify your email address and activate your account.</Alert>}
           <Button disabled={isPending} type="submit" variant="contained">
             Sign up

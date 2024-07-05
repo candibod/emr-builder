@@ -1,19 +1,19 @@
 "use client";
 
 import * as React from "react";
+import { z as zod } from "zod";
+import { authClient } from "../../lib/client";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Controller, useForm } from "react-hook-form";
+
+import Stack from "@mui/material/Stack";
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
-import FormControl from "@mui/material/FormControl";
-import FormHelperText from "@mui/material/FormHelperText";
-import InputLabel from "@mui/material/InputLabel";
-import OutlinedInput from "@mui/material/OutlinedInput";
-import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import { Controller, useForm } from "react-hook-form";
-import { z as zod } from "zod";
-
-import { authClient } from "../../lib/client";
+import InputLabel from "@mui/material/InputLabel";
+import FormControl from "@mui/material/FormControl";
+import OutlinedInput from "@mui/material/OutlinedInput";
+import FormHelperText from "@mui/material/FormHelperText";
 
 const schema = zod.object({ email: zod.string().min(1, { message: "Email is required" }).email() });
 
@@ -23,6 +23,7 @@ const defaultValues = { email: "" } satisfies Values;
 
 export function ResetPasswordForm(): React.JSX.Element {
   const [isPending, setIsPending] = React.useState<boolean>(false);
+  const [displaySuccessMessage, setDisplaySuccessMessage] = React.useState<boolean>(false);
 
   const {
     control,
@@ -35,17 +36,15 @@ export function ResetPasswordForm(): React.JSX.Element {
     async (values: Values): Promise<void> => {
       setIsPending(true);
 
-      const { error } = await authClient.resetPassword(values);
+      const { error } = await authClient.resetPassword(values.email);
 
       if (error) {
         setError("root", { type: "server", message: error });
         setIsPending(false);
         return;
+      } else {
+        setDisplaySuccessMessage(true);
       }
-
-      setIsPending(false);
-
-      // Redirect to confirm password reset
     },
     [setError]
   );
@@ -66,7 +65,12 @@ export function ResetPasswordForm(): React.JSX.Element {
               </FormControl>
             )}
           />
-          {errors.root ? <Alert color="error">{errors.root.message}</Alert> : null}
+          {errors.root && !displaySuccessMessage ? (
+            <Alert severity="error" color="error">
+              {errors.root.message}
+            </Alert>
+          ) : null}
+          {displaySuccessMessage && <Alert severity="success">Password reset request is successful, Please check your email to reset password.</Alert>}
           <Button disabled={isPending} type="submit" variant="contained">
             Send recovery link
           </Button>

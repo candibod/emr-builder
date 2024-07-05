@@ -25,8 +25,11 @@ export interface VerifyEmailParams {
   apiKey: string;
 }
 
-export interface ResetPasswordParams {
-  email: string;
+export interface UpdatePasswordParams {
+  password: string;
+  mode: string;
+  oobCode: string;
+  apiKey: string;
 }
 
 export interface ErrorResponse {
@@ -200,12 +203,34 @@ class AuthClient {
       });
   }
 
-  async resetPassword(_: ResetPasswordParams): Promise<{ error?: string }> {
-    return { error: "Password reset not implemented" };
+  async resetPassword(email: string): Promise<{ error?: string }> {
+    return apiRequestHandler("auth/reset-password", "POST", { email: email })
+      .then((response) => {
+        if (response.ok) {
+          return {};
+        } else {
+          return { error: response.message };
+        }
+      })
+      .catch((error) => {
+        return { error: error.message };
+      });
   }
 
-  async updatePassword(_: ResetPasswordParams): Promise<{ error?: string }> {
-    return { error: "Update reset not implemented" };
+  async updatePassword(params: UpdatePasswordParams): Promise<{ error?: string }> {
+    const { password, mode, oobCode, apiKey } = params;
+
+    return apiRequestHandler("auth/action", "POST", { password: password, mode: mode, oobCode: oobCode, apiKey: apiKey })
+      .then((response) => {
+        if (response.ok) {
+          return {};
+        } else {
+          return { error: response.message };
+        }
+      })
+      .catch((error) => {
+        return { error: error.message };
+      });
   }
 
   async getUser(): Promise<{ data?: User | null; error?: string }> {
