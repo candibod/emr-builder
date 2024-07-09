@@ -175,6 +175,8 @@ class AuthClient {
         if (response.ok) {
           const token = generateToken();
           localStorage.setItem("emr-auth-token", token);
+          localStorage.setItem("user_full_name", response.data?.full_name);
+          localStorage.setItem("user_email", response.data?.email);
           return {};
         } else {
           return { error: response.message };
@@ -192,6 +194,8 @@ class AuthClient {
       .then((response) => {
         if (response.ok) {
           const token = generateToken();
+          localStorage.setItem("emr-auth-token", token);
+          localStorage.setItem("user_full_name", token);
           localStorage.setItem("emr-auth-token", token);
           return {};
         } else {
@@ -240,7 +244,11 @@ class AuthClient {
       return { data: null };
     }
 
-    return { data: { id: token } };
+    return {
+      data: {
+        id: token,
+      },
+    };
   }
 
   async signOut(): Promise<{ error?: string }> {

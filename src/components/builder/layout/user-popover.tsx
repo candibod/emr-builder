@@ -50,9 +50,9 @@ export function UserPopover({ anchorEl, onClose, open }: UserPopoverProps): Reac
   return (
     <Popover anchorEl={anchorEl} anchorOrigin={{ horizontal: "left", vertical: "bottom" }} onClose={onClose} open={open} slotProps={{ paper: { sx: { width: "240px" } } }}>
       <Box sx={{ p: "16px 20px " }}>
-        <Typography variant="subtitle1">Sofia Rivers</Typography>
+        <Typography variant="subtitle1">{localStorage.getItem("user_full_name")}</Typography>
         <Typography color="text.secondary" variant="body2">
-          sofia.rivers@devias.io
+          {localStorage.getItem("user_email")}
         </Typography>
       </Box>
       <Divider />
