@@ -429,8 +429,22 @@ class ResumeClient {
 }
 
 class ScraperClient {
-  async getJobs(): Promise<{ data?: ApiResponse; error?: string }> {
-    return apiRequestHandler("scraper/jobs", "GET")
+  async getLogs(): Promise<{ data?: ApiResponse; error?: string }> {
+    return apiRequestHandler("scraper/logs", "GET")
+      .then((response) => {
+        if (response.ok) {
+          return { data: response.data };
+        } else {
+          return { error: response.message };
+        }
+      })
+      .catch((error) => {
+        return { error: error.message };
+      });
+  }
+
+  async getJobs(id: string): Promise<{ data?: ApiResponse; error?: string }> {
+    return apiRequestHandler("scraper/jobs/" + id, "GET")
       .then((response) => {
         if (response.ok) {
           return { data: response.data };

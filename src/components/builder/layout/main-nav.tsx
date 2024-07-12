@@ -6,6 +6,7 @@ import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
 import MenuIcon from "@mui/icons-material/Menu";
+import { usePathname } from "next/navigation";
 import { usePopover } from "../../../hooks/use-popover";
 
 import { MobileNav } from "./mobile-nav";
@@ -13,6 +14,17 @@ import { UserPopover } from "./user-popover";
 import { Typography } from "@mui/material";
 
 export function MainNav(): React.JSX.Element {
+  let pathname = usePathname();
+  if (pathname.startsWith("/builder")) {
+    pathname = "Resume";
+  } else if (pathname.startsWith("/scraper")) {
+    pathname = "Scraper";
+  } else if (pathname.startsWith("/Tools")) {
+    pathname = "Tools";
+  } else {
+    pathname = "";
+  }
+
   const [openNav, setOpenNav] = React.useState<boolean>(false);
 
   const userPopover = usePopover<HTMLDivElement>();
@@ -39,7 +51,7 @@ export function MainNav(): React.JSX.Element {
             >
               <MenuIcon />
             </IconButton>
-            <Typography variant="h4">Account</Typography>
+            <Typography variant="h4">{pathname}</Typography>
           </Stack>
           <Stack sx={{ alignItems: "center" }} direction="row" spacing={2}>
             <Avatar onClick={userPopover.handleOpen} ref={userPopover.anchorRef} src="/assets/avatar.png" sx={{ cursor: "pointer" }} />

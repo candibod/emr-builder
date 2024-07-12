@@ -2,39 +2,25 @@
 
 import * as React from "react";
 import RouterLink from "next/link";
-import { usePathname } from "next/navigation";
-import Box from "@mui/material/Box";
-import Divider from "@mui/material/Divider";
-import Stack from "@mui/material/Stack";
-import Typography from "@mui/material/Typography";
-import ListSubheader from "@mui/material/ListSubheader";
-import List from "@mui/material/List";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import Collapse from "@mui/material/Collapse";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import DraftsIcon from "@mui/icons-material/Drafts";
-import SendIcon from "@mui/icons-material/Send";
-import ExpandLess from "@mui/icons-material/ExpandLess";
-import ExpandMore from "@mui/icons-material/ExpandMore";
-import StarBorder from "@mui/icons-material/StarBorder";
-
-import type { NavItemConfig } from "../../../types/nav";
-import { paths } from "../../../paths";
-import { isNavItemActive } from "../../../lib/is-nav-item-active";
-import { Logo } from "../../../components/core/logo";
 
 import { navItems } from "./config";
 import { navIcons } from "./nav-icons";
+import { paths } from "../../../paths";
+import { usePathname } from "next/navigation";
+import { Logo } from "../../../components/core/logo";
+import type { NavItemConfig } from "../../../types/nav";
+import { isNavItemActive } from "../../../lib/is-nav-item-active";
+
+import Box from "@mui/material/Box";
+import List from "@mui/material/List";
+import Stack from "@mui/material/Stack";
+import Divider from "@mui/material/Divider";
+import Typography from "@mui/material/Typography";
+import ListItemText from "@mui/material/ListItemText";
+import ListItemButton from "@mui/material/ListItemButton";
 
 export function SideNav(): React.JSX.Element {
-  const pathname = usePathname();
-  const [open, setOpen] = React.useState(true);
-
-  const handleClick = () => {
-    setOpen(!open);
-  };
+  let pathname = usePathname();
 
   return (
     <Box
@@ -70,38 +56,6 @@ export function SideNav(): React.JSX.Element {
         </Box>
       </Stack>
       <Divider sx={{ borderColor: "var(--mui-palette-neutral-700)" }} />
-      <Box>
-        <List sx={{ width: "100%", maxWidth: 360, bgcolor: "rgba(71, 98, 130, 0.2)" }} component="nav" aria-labelledby="nested-list-subheader">
-          <ListItemButton>
-            <ListItemIcon>
-              <SendIcon />
-            </ListItemIcon>
-            <ListItemText primary="Sent mail" />
-          </ListItemButton>
-          <ListItemButton>
-            <ListItemIcon>
-              <DraftsIcon />
-            </ListItemIcon>
-            <ListItemText primary="Drafts" />
-          </ListItemButton>
-          <ListItemButton onClick={handleClick}>
-            <ListItemIcon>
-              <InboxIcon />
-            </ListItemIcon>
-            <ListItemText primary="Inbox" />
-            {open ? <ExpandLess /> : <ExpandMore />}
-          </ListItemButton>
-          <List component="div" disablePadding>
-            <ListItemButton sx={{ pl: 4 }}>
-              <ListItemIcon>
-                <StarBorder />
-              </ListItemIcon>
-              <ListItemText primary="Starred" />
-            </ListItemButton>
-          </List>
-        </List>
-      </Box>
-
       <Box component="nav" sx={{ flex: "1 1 auto", p: "12px" }}>
         <List sx={{ width: "100%", maxWidth: 360, bgcolor: "#121621" }} component="nav" aria-labelledby="nested-list-subheader">
           {renderNavItems({ pathname, items: navItems })}
@@ -115,14 +69,13 @@ function renderNavItems({ items = [], pathname }: { items?: NavItemConfig[]; pat
   const children = items.reduce((acc: React.ReactNode[], curr: NavItemConfig): React.ReactNode[] => {
     const { key, ...item } = curr;
 
-    // acc.push(<NavItem key={key} pathname={pathname} {...item} />);
     acc.push(<MuiListNavItem key={key} pathname={pathname} {...item} />);
 
     return acc;
   }, []);
 
   return (
-    <Stack component="ul" spacing={1} sx={{ listStyle: "none", m: 0, p: 0 }}>
+    <Stack component="ul" sx={{ listStyle: "none", m: 0, p: 0 }}>
       {children}
     </Stack>
   );
@@ -132,17 +85,22 @@ interface NavItemProps extends NavItemConfig {
   pathname: string;
 }
 
+function omit(key: any, obj: any) {
+  const { [key]: omitted, ...rest } = obj;
+  return rest;
+}
+
 function MuiListNavItem({ disabled, external, href, icon, matcher, pathname, title, items }: NavItemProps): React.JSX.Element {
   const active = isNavItemActive({ disabled, external, href, matcher, pathname });
   const Icon = icon ? navIcons[icon] : null;
-
-  console.log(items);
 
   return (
     <>
       <ListItemButton
         sx={{
           borderRadius: 1,
+          p: "4px 8px",
+          mt: 0.2,
           color: "var(--NavItem-color)",
           cursor: "pointer",
           ...(disabled && {
@@ -150,6 +108,9 @@ function MuiListNavItem({ disabled, external, href, icon, matcher, pathname, tit
             color: "var(--NavItem-disabled-color)",
             cursor: "not-allowed",
           }),
+          "&:hover": {
+            backgroundColor: active ? "var(--NavItem-active-background)" : "#ffffff12",
+          },
           ...(active && { bgcolor: "var(--NavItem-active-background)", color: "var(--NavItem-active-color)" }),
         }}
       >
@@ -171,7 +132,6 @@ function MuiListNavItem({ disabled, external, href, icon, matcher, pathname, tit
               display: "flex",
               flex: "0 0 auto",
               gap: 1,
-              p: "6px 16px",
               position: "relative",
               textDecoration: "none",
               whiteSpace: "nowrap",
@@ -193,9 +153,9 @@ function MuiListNavItem({ disabled, external, href, icon, matcher, pathname, tit
         </ListItemText>
       </ListItemButton>
       {items && (
-        <List>
-          {items.map((item: NavItemConfig) => (
-            <NavItem key={item.key} pathname={pathname} {...item} />
+        <List dense={true} sx={{ m: "0 0 0 20px", p: 0 }}>
+          {items.map((item: NavItemConfig, index) => (
+            <MuiListNavItem key={index} pathname={pathname} {...omit("key", { ...item })} />
           ))}
         </List>
       )}

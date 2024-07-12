@@ -19,29 +19,33 @@ import EditIcon from "@mui/icons-material/Edit";
 import getFormattedTime from "../../../lib/utils";
 import { scraperClient } from "../../../lib/client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { paths } from "../../../paths";
 
 export function JobList(): React.JSX.Element {
   const router = useRouter();
+  const params = useParams();
+  const { slug } = params;
 
   const [isPending, setIsPending] = React.useState<boolean>(false);
   const [jobsListData, setJobsListData] = React.useState([]);
   const [selectedRow, setSelectedRow] = React.useState({});
 
   React.useEffect(() => {
+    console.log(slug);
     async function fetchMyAPI() {
-      setIsPending(true);
+      if (slug !== undefined) {
+        setIsPending(true);
+        const { data, error } = await scraperClient.getJobs(slug);
 
-      const { data, error } = await scraperClient.getJobs();
+        if (error) {
+          console.log("error", error);
+          setIsPending(false);
+          return;
+        }
 
-      if (error) {
-        console.log("error", error);
-        setIsPending(false);
-        return;
+        if (data) setJobsListData(data);
       }
-
-      if (data) setJobsListData(data);
     }
 
     fetchMyAPI();
@@ -113,7 +117,7 @@ export function JobList(): React.JSX.Element {
       ) : (
         <Stack spacing={1}>
           <Typography align="center" variant="subtitle1" sx={{ p: 4, color: "#8b8b8b" }}>
-            Create a new job to start reviewing your resume
+            Fetching Jobs...
           </Typography>
         </Stack>
       )}

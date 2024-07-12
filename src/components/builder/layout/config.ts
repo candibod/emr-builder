@@ -3,17 +3,35 @@ import { paths } from "../../../paths";
 
 export const navItems = [
   {
-    key: "New Job",
-    title: "New Job",
-    href: paths.builder.newJob,
-    icon: "new-note",
+    key: "Resume",
+    title: "Resume",
+    href: "#",
+    icon: "description",
     items: [
-      { key: "Resume 1", title: "Resume 1", href: paths.builder.resumeReviews, icon: "copy-all" },
-      { key: "Resume 2", title: "Resume 2", href: paths.builder.resumeReviews, icon: "copy-all" },
+      { key: "New Job", title: "New Job", href: paths.builder.newJob, icon: "new-note" },
+      { key: "Resume Reviews", title: "Resume Reviews", href: paths.builder.resumeReviews, icon: "reviews" },
+      { key: "Upload Resume", title: "Upload Resume", href: paths.builder.uploadResume, icon: "upload-file" },
     ],
   },
-  { key: "Resume Reviews", title: "Resume Reviews", href: paths.builder.resumeReviews, icon: "copy-all" },
-  { key: "Scraper Jobs", title: "Scraper Jobs", href: paths.scraper.jobs, icon: "copy-all" },
-  { key: "Upload Resume", title: "Upload Resume", href: paths.builder.uploadResume, icon: "upload-file" },
+  {
+    key: "Job Scraper",
+    title: "Job Scraper",
+    href: "#",
+    icon: "scraper",
+    items: [
+      { key: "Logs", title: "Logs", href: paths.scraper.logs, icon: "logs" },
+      { key: "Jobs", title: "Jobs", href: paths.scraper.jobs, icon: "jobs" },
+    ],
+  },
+  {
+    key: "Quick Tools",
+    title: "Quick Tools",
+    href: "#",
+    icon: "quick-tools",
+    items: [
+      { key: "Get Keywords", title: "Get Keywords", href: "#", icon: "get-keywords" },
+      { key: "Job Match Score", title: "Job Match Score", href: "#", icon: "match-score" },
+    ],
+  },
   { key: "account", title: "Account", href: paths.builder.account, icon: "user" },
 ] satisfies NavItemConfig[];

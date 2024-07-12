@@ -16,7 +16,8 @@ export const paths = {
     account: "/builder/account",
   },
   scraper: {
-    jobs: "/scraper/jobs",
+    jobs: "/scraper/jobs/",
+    logs: "/scraper/logs",
   },
   errors: { notFound: "/errors/not-found" },
 } as const;
