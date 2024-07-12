@@ -33,7 +33,7 @@ export function ResumeReviews(): React.JSX.Element {
     async function fetchMyAPI() {
       setIsPending(true);
 
-      const { data, error } = await resumeClient.getResumeReviews();
+      const { data, error }: any = await resumeClient.getResumeReviews();
 
       if (error) {
         console.log("error", error);
@@ -47,7 +47,7 @@ export function ResumeReviews(): React.JSX.Element {
     fetchMyAPI();
   }, []);
 
-  function editResumeReview(e) {
+  function editResumeReview(e: any) {
     const review_id = e.currentTarget.getAttribute("data-id");
 
     router.replace(paths.builder.resumeReview + review_id);
@@ -77,7 +77,7 @@ export function ResumeReviews(): React.JSX.Element {
               </TableRow>
             </TableHead>
             <TableBody>
-              {resumeReviewsData.map((row) => (
+              {resumeReviewsData.map((row: any) => (
                 <TableRow key={row.review_id} sx={{ "&:last-child td, &:last-child th": { border: 0 } }} onClick={() => setSelectedRow(row)}>
                   <TableCell align="right">
                     <Stack direction="row" alignItems="center" spacing={1}>

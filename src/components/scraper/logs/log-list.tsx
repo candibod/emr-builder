@@ -32,7 +32,7 @@ export function LogList(): React.JSX.Element {
     async function fetchMyAPI() {
       setIsPending(true);
 
-      const { data, error } = await scraperClient.getLogs();
+      const { data, error }: any = await scraperClient.getLogs();
 
       if (error) {
         console.log("error", error);
@@ -46,7 +46,7 @@ export function LogList(): React.JSX.Element {
     fetchMyAPI();
   }, []);
 
-  function showJobs(e) {
+  function showJobs(e: any) {
     const log_id = e.currentTarget.getAttribute("data-id");
 
     router.replace(paths.scraper.jobs + log_id);
@@ -73,7 +73,7 @@ export function LogList(): React.JSX.Element {
               </TableRow>
             </TableHead>
             <TableBody>
-              {jobsListData.map((row) => (
+              {jobsListData.map((row: any) => (
                 <TableRow key={row.uuid} sx={{ "&:last-child td, &:last-child th": { border: 0 } }} onClick={() => setSelectedRow(row)}>
                   <TableCell component="th" scope="row">
                     {getFormattedTime(row.created_at)}

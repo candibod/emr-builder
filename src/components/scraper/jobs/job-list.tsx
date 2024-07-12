@@ -36,7 +36,7 @@ export function JobList(): React.JSX.Element {
     async function fetchMyAPI() {
       if (slug !== undefined) {
         setIsPending(true);
-        const { data, error } = await scraperClient.getJobs(slug);
+        const { data, error }: any = await scraperClient.getJobs(slug);
 
         if (error) {
           console.log("error", error);
@@ -51,7 +51,7 @@ export function JobList(): React.JSX.Element {
     fetchMyAPI();
   }, []);
 
-  function editResumeReview(e) {
+  function editResumeReview(e: any) {
     const review_id = e.currentTarget.getAttribute("data-id");
 
     router.replace(paths.builder.resumeReview + review_id);
@@ -84,7 +84,7 @@ export function JobList(): React.JSX.Element {
               </TableRow>
             </TableHead>
             <TableBody>
-              {jobsListData.map((row) => (
+              {jobsListData.map((row: any) => (
                 <TableRow key={row.job_id} sx={{ "&:last-child td, &:last-child th": { border: 0 } }} onClick={() => setSelectedRow(row)}>
                   <TableCell align="right">
                     <Stack direction="row" alignItems="center" spacing={1}>

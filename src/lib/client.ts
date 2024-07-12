@@ -112,7 +112,7 @@ async function apiRequestHandler(url: string, method: string, body?: object, hea
   return api_response;
 }
 
-async function apiFileRequestHandler(url: string, method: string, body?: object, headers?: object) {
+async function apiFileRequestHandler(url: string, method: string, body?: any, headers?: object) {
   const response = await fetch(process.env.NEXT_PUBLIC_API_HOST_URL + url, {
     method: method,
     credentials: "include",
@@ -172,11 +172,12 @@ class AuthClient {
 
     return apiRequestHandler("auth/signin", "POST", { email: email, password: password })
       .then((response) => {
-        if (response.ok) {
+        if (response.ok && response.data) {
           const token = generateToken();
           localStorage.setItem("emr-auth-token", token);
-          localStorage.setItem("user_full_name", response.data?.full_name);
-          localStorage.setItem("user_email", response.data?.email);
+          let { name, email }: any = response.data;
+          localStorage.setItem("user_full_name", name);
+          localStorage.setItem("user_email", email);
           return {};
         } else {
           return { error: response.message };
@@ -366,7 +367,7 @@ class ResumeClient {
       });
   }
 
-  async getResumeReview(id: any): Promise<{ data?: ResumeResponse; error?: string }> {
+  async getResumeReview(id: any): Promise<{ data?: ApiResponse; error?: string }> {
     return apiRequestHandler("resume/resume-review/" + id, "GET")
       .then((response) => {
         if (response.ok) {
@@ -443,7 +444,7 @@ class ScraperClient {
       });
   }
 
-  async getJobs(id: string): Promise<{ data?: ApiResponse; error?: string }> {
+  async getJobs(id: any): Promise<{ data?: ApiResponse; error?: string }> {
     return apiRequestHandler("scraper/jobs/" + id, "GET")
       .then((response) => {
         if (response.ok) {

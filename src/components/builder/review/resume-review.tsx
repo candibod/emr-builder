@@ -54,7 +54,7 @@ export function ResumeReview(): React.JSX.Element {
   const [resume, setResume] = React.useState<Resume | undefined>();
   const [selectedSkills, setSelectedSkills] = React.useState<Array<string>>([]);
   const [relevantBullets, setRelevantBullets] = React.useState<Array<string>>([]);
-  const [generatedText, setGeneratedText] = React.useState({});
+  const [generatedText, setGeneratedText] = React.useState<any>({});
   const [bulletEditStatus, setBulletEditStatus] = React.useState({ state: "", bullet: "", id: "" });
   const params = useParams();
   const { slug } = params;
@@ -62,7 +62,7 @@ export function ResumeReview(): React.JSX.Element {
   async function fetchMyAPI() {
     setIsPending(true);
     if (slug !== undefined) {
-      const { data, error } = await resumeClient.getResumeReview(slug);
+      const { data, error }: any = await resumeClient.getResumeReview(slug);
 
       if (error) {
         console.log("error", error);
@@ -115,14 +115,14 @@ export function ResumeReview(): React.JSX.Element {
     [setError, selectedSkills]
   );
 
-  async function getRelevantBullets(skills, skill = "") {
+  async function getRelevantBullets(skills: any, skill = "") {
     let skills_concatenated = "";
     for (let i = 0; i < skills.length; i++) {
       skills_concatenated = skills_concatenated + skills[i] + ",";
     }
     skills_concatenated = skills_concatenated + skill;
 
-    const { data, error } = await resumeClient.getRelevantBullets(skills_concatenated);
+    const { data, error }: any = await resumeClient.getRelevantBullets(skills_concatenated);
 
     if (error) {
       console.log("error", error);
@@ -155,21 +155,21 @@ export function ResumeReview(): React.JSX.Element {
     }
   };
 
-  const handleBulletClickAdd = (e) => {
+  const handleBulletClickAdd = (e: any) => {
     const id = e.currentTarget.getAttribute("data-id");
     const bullet = e.currentTarget.getAttribute("data-bullet");
 
     setBulletEditStatus({ state: "add", bullet: bullet, id: id });
   };
 
-  const handleBulletClickReplace = (e) => {
+  const handleBulletClickReplace = (e: any) => {
     const id = e.currentTarget.getAttribute("data-id");
     const bullet = e.currentTarget.getAttribute("data-bullet");
 
     setBulletEditStatus({ state: "replace", bullet: bullet, id: id });
   };
 
-  const handleBulletClickCancel = (action: string = "") => {
+  const handleBulletClickCancel = (action: any = "") => {
     setBulletEditStatus({ state: "", bullet: "", id: "" });
 
     if (action === "delete") {
@@ -179,7 +179,7 @@ export function ResumeReview(): React.JSX.Element {
 
   async function updateResume(action: string, resume_data: any, is_resume_data_update: boolean = false) {
     setIsPending(true);
-    const { data, error } = await resumeClient.updateResume(slug[0], action, resume_data);
+    const { data, error }: any = await resumeClient.updateResume(slug[0], action, resume_data);
 
     if (error) {
       console.log("error", error);
@@ -335,7 +335,7 @@ export function ResumeReview(): React.JSX.Element {
                       <TableBody>
                         {relevantBullets.length > 0 ? (
                           <>
-                            {relevantBullets.map((bullet, key: number) => (
+                            {relevantBullets.map((bullet: any, key: number) => (
                               <TableRow key={key} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
                                 <TableCell component="th" scope="row">
                                   {bullet.bullet}

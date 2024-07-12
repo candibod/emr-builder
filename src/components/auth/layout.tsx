@@ -6,6 +6,7 @@ import Typography from "@mui/material/Typography";
 
 import { paths } from "../../paths";
 import { DynamicLogo } from "../core/logo";
+import { GuestGuard } from "./guest-guard";
 
 export interface LayoutProps {
   children: React.ReactNode;
@@ -13,53 +14,57 @@ export interface LayoutProps {
 
 export function Layout({ children }: LayoutProps): React.JSX.Element {
   return (
-    <Box
-      sx={{
-        display: { xs: "flex", lg: "grid" },
-        flexDirection: "column",
-        gridTemplateColumns: "1fr 1fr",
-        minHeight: "100%",
-      }}
-    >
-      <Box sx={{ display: "flex", flex: "1 1 auto", flexDirection: "column" }}>
-        <Box sx={{ p: 3 }}>
-          <Box component={RouterLink} href={paths.home} sx={{ display: "inline-block", fontSize: 0 }}>
-            <DynamicLogo colorDark="light" colorLight="dark" height={60} width={205} />
-          </Box>
-        </Box>
-        <Box sx={{ alignItems: "center", display: "flex", flex: "1 1 auto", justifyContent: "center", p: 3 }}>
-          <Box sx={{ maxWidth: "450px", width: "100%" }}>{children}</Box>
-        </Box>
-      </Box>
-      <Box
-        sx={{
-          alignItems: "center",
-          margin: "20px 20px 20px 0",
-          borderRadius: "30px",
-          background: "radial-gradient(50% 50% at 50% 50%, #8598b6 0%, #090E23 100%)",
-          color: "var(--mui-palette-common-white)",
-          display: { xs: "none", lg: "flex" },
-          justifyContent: "center",
-          p: 3,
-        }}
-      >
-        <Stack spacing={3}>
-          <Stack spacing={1}>
-            <Typography color="inherit" sx={{ fontSize: "24px", lineHeight: "32px", textAlign: "center" }} variant="h1">
-              Welcome to{" "}
-              <Box component="span" sx={{ color: "#15b79e" }}>
-                Elevate My Resume
+    <GuestGuard>
+      <React.Fragment>
+        <Box
+          sx={{
+            display: { xs: "flex", lg: "grid" },
+            flexDirection: "column",
+            gridTemplateColumns: "1fr 1fr",
+            minHeight: "100%",
+          }}
+        >
+          <Box sx={{ display: "flex", flex: "1 1 auto", flexDirection: "column" }}>
+            <Box sx={{ p: 3 }}>
+              <Box component={RouterLink} href={paths.home} sx={{ display: "inline-block", fontSize: 0 }}>
+                <DynamicLogo colorDark="light" colorLight="dark" height={60} width={205} />
               </Box>
-            </Typography>
-            <Typography align="center" variant="subtitle1">
-              Get Tailored Resume
-            </Typography>
-          </Stack>
-          <Box sx={{ display: "flex", justifyContent: "center" }}>
-            <Box component="img" alt="Widgets" src="/assets/auth-widgets.png" sx={{ height: "auto", width: "100%", maxWidth: "800px" }} />
+            </Box>
+            <Box sx={{ alignItems: "center", display: "flex", flex: "1 1 auto", justifyContent: "center", p: 3 }}>
+              <Box sx={{ maxWidth: "450px", width: "100%" }}>{children}</Box>
+            </Box>
           </Box>
-        </Stack>
-      </Box>
-    </Box>
+          <Box
+            sx={{
+              alignItems: "center",
+              margin: "20px 20px 20px 0",
+              borderRadius: "30px",
+              background: "radial-gradient(50% 50% at 50% 50%, #8598b6 0%, #090E23 100%)",
+              color: "var(--mui-palette-common-white)",
+              display: { xs: "none", lg: "flex" },
+              justifyContent: "center",
+              p: 3,
+            }}
+          >
+            <Stack spacing={3}>
+              <Stack spacing={1}>
+                <Typography color="inherit" sx={{ fontSize: "24px", lineHeight: "32px", textAlign: "center" }} variant="h1">
+                  Welcome to{" "}
+                  <Box component="span" sx={{ color: "#15b79e" }}>
+                    Elevate My Resume
+                  </Box>
+                </Typography>
+                <Typography align="center" variant="subtitle1">
+                  Get Tailored Resume
+                </Typography>
+              </Stack>
+              <Box sx={{ display: "flex", justifyContent: "center" }}>
+                <Box component="img" alt="Widgets" src="/assets/auth-widgets.png" sx={{ height: "auto", width: "100%", maxWidth: "800px" }} />
+              </Box>
+            </Stack>
+          </Box>
+        </Box>
+      </React.Fragment>
+    </GuestGuard>
   );
 }
