@@ -98,8 +98,10 @@ export function ResumeReview(): React.JSX.Element {
       for (let i = 0; i < selectedSkills.length; i++) {
         skills_concatenated = skills_concatenated + selectedSkills[i] + ",";
       }
-      values["keywords"] = skills_concatenated;
-      const { data, error } = await resumeClient.generateText(values);
+
+      let request_data: any = values;
+      request_data["keywords"] = skills_concatenated;
+      const { data, error } = await resumeClient.generateText(request_data);
 
       if (error) {
         setError("root", { type: "server", message: error });

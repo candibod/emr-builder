@@ -18,7 +18,7 @@ import { resumeClient } from "../../../lib/client";
 export function UploadResume(): React.JSX.Element {
   const [file, setFile] = React.useState(null);
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event: any) => {
     event.preventDefault();
 
     const { data, error } = await resumeClient.uploadResume({ file: file, role: "SDE" });
@@ -47,7 +47,7 @@ export function UploadResume(): React.JSX.Element {
           <Divider />
           <CardContent>
             <Grid container spacing={3}>
-              <TextField type="file" onChange={(e) => setFile(e.target.files[0])}></TextField>
+              <TextField type="file" onChange={(e: any) => setFile(e.target.files[0])}></TextField>
             </Grid>
           </CardContent>
           <Divider />

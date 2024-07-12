@@ -24,14 +24,14 @@ export interface LayoutProps {
   children: React.ReactNode;
 }
 
-export function NewJobStats(props): React.JSX.Element {
+export function NewJobStats(props: any): React.JSX.Element {
   const router = useRouter();
 
-  async function handleButtonClick(e) {
+  async function handleButtonClick(e: any) {
     const resume_id = e.currentTarget.getAttribute("data-resume-id");
     const builder_id = e.currentTarget.getAttribute("data-builder-id");
 
-    const { data, error } = resumeClient.updateResumeForBuilder({ resume_id: resume_id, builder_id: builder_id });
+    const { data, error }: any = resumeClient.updateResumeForBuilder({ resume_id: resume_id, builder_id: builder_id });
 
     if (error) {
       alert(error);
@@ -45,7 +45,7 @@ export function NewJobStats(props): React.JSX.Element {
     <>
       {props.jobStatsData && Object.keys(props.jobStatsData).length > 0 ? (
         <List sx={{ width: "100%", maxHeight: "calc(100vh - 150px)", overflowX: "hidden", overflowY: "scroll", bgcolor: "background.paper" }}>
-          {props.jobStatsData?.resume_match_stats.map((resume_stats, key: number) => (
+          {props.jobStatsData?.resume_match_stats.map((resume_stats: any, key: number) => (
             <Paper key={key} elevation={12} sx={{ borderRadius: "20px", margin: "15px" }}>
               <Card variant="outlined">
                 <CardHeader
@@ -60,7 +60,7 @@ export function NewJobStats(props): React.JSX.Element {
                 <CardContent sx={{ padding: "0px 20px 0px 20px" }}>
                   {resume_stats.found.length > 0 ? (
                     <Box sx={{ mt: "10px" }}>
-                      {resume_stats.found.map((keyword, key: number) => (
+                      {resume_stats.found.map((keyword: any, key: number) => (
                         <Chip key={key} sx={{ mr: "3px" }} variant="outlined" color="success" size="small" label={keyword} />
                       ))}
                     </Box>
@@ -69,7 +69,7 @@ export function NewJobStats(props): React.JSX.Element {
                   )}
                   {resume_stats.not_found.length > 0 ? (
                     <Box sx={{ mt: "10px" }}>
-                      {resume_stats.not_found.map((keyword, key: number) => (
+                      {resume_stats.not_found.map((keyword: any, key: number) => (
                         <Chip key={key} sx={{ mr: "3px" }} variant="outlined" color="warning" size="small" label={keyword} />
                       ))}
                     </Box>

@@ -300,7 +300,7 @@ export interface ResumeResponse {
 }
 
 class ResumeClient {
-  async uploadResume(params: { file: Blob; role: string }): Promise<{ data?: ApiResponse; error?: string }> {
+  async uploadResume(params: { file: any; role: string }): Promise<{ data?: ApiResponse; error?: string }> {
     const { file, role } = params;
 
     const formData = new FormData();
@@ -366,7 +366,7 @@ class ResumeClient {
       });
   }
 
-  async getResumeReview(id: string): Promise<{ data?: ResumeResponse; error?: string }> {
+  async getResumeReview(id: any): Promise<{ data?: ResumeResponse; error?: string }> {
     return apiRequestHandler("resume/resume-review/" + id, "GET")
       .then((response) => {
         if (response.ok) {
