@@ -1,5 +1,6 @@
 import * as React from "react";
 import type { Metadata } from "next";
+import { Suspense } from "react";
 
 import { config } from "../../../config";
 import { Layout } from "../../../components/auth/layout";
@@ -12,7 +13,9 @@ export default function Action(): React.JSX.Element {
   return (
     <IdleGuard>
       <Layout>
-        <AuthAction />
+        <Suspense>
+          <AuthAction />
+        </Suspense>
       </Layout>
     </IdleGuard>
   );
