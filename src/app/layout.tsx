@@ -15,6 +15,9 @@ interface LayoutProps {
 export default function Layout({ children }: LayoutProps): React.JSX.Element {
   return (
     <html lang="en">
+      <head>
+        <link rel="icon" href="/icon.ico" sizes="any" />
+      </head>
       <body>
         <UserProvider>
           <ThemeProvider>{children}</ThemeProvider>
