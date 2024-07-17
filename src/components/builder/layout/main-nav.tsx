@@ -54,7 +54,7 @@ export function MainNav(): React.JSX.Element {
             <Typography variant="h4">{pathname}</Typography>
           </Stack>
           <Stack sx={{ alignItems: "center" }} direction="row" spacing={2}>
-            <Avatar onClick={userPopover.handleOpen} ref={userPopover.anchorRef} src="/assets/avatar.png" sx={{ cursor: "pointer" }} />
+            <Avatar onClick={userPopover.handleOpen} ref={userPopover.anchorRef} sx={{ cursor: "pointer" }} />
           </Stack>
         </Stack>
       </Box>

@@ -17,5 +17,7 @@ export function isNavItemActive({ disabled, external, href, matcher, pathname }:
     return false;
   }
 
+  if (pathname.startsWith(href)) return true;
+
   return pathname === href;
 }

@@ -2,20 +2,23 @@
 
 import * as React from "react";
 import RouterLink from "next/link";
-import { usePathname } from "next/navigation";
-import Box from "@mui/material/Box";
-import Divider from "@mui/material/Divider";
-import Drawer from "@mui/material/Drawer";
-import Stack from "@mui/material/Stack";
-import Typography from "@mui/material/Typography";
-
-import type { NavItemConfig } from "../../../types/nav";
-import { paths } from "../../../paths";
-import { isNavItemActive } from "../../../lib/is-nav-item-active";
-import { Logo } from "../../../components/core/logo";
 
 import { navItems } from "./config";
+import { paths } from "../../../paths";
 import { navIcons } from "./nav-icons";
+import { usePathname } from "next/navigation";
+import { Logo } from "../../../components/core/logo";
+import type { NavItemConfig } from "../../../types/nav";
+import { isNavItemActive } from "../../../lib/is-nav-item-active";
+
+import Box from "@mui/material/Box";
+import List from "@mui/material/List";
+import Stack from "@mui/material/Stack";
+import Drawer from "@mui/material/Drawer";
+import Divider from "@mui/material/Divider";
+import Typography from "@mui/material/Typography";
+import ListItemText from "@mui/material/ListItemText";
+import ListItemButton from "@mui/material/ListItemButton";
 
 export interface MobileNavProps {
   onClose?: () => void;
@@ -61,7 +64,9 @@ export function MobileNav({ open, onClose }: MobileNavProps): React.JSX.Element 
       </Stack>
       <Divider sx={{ borderColor: "var(--mui-palette-neutral-700)" }} />
       <Box component="nav" sx={{ flex: "1 1 auto", p: "12px" }}>
-        {renderNavItems({ pathname, items: navItems })}
+        <List sx={{ width: "100%", maxWidth: 360, bgcolor: "#121621" }} component="nav" aria-labelledby="nested-list-subheader">
+          {renderNavItems({ pathname, items: navItems })}
+        </List>
       </Box>
     </Drawer>
   );
@@ -71,20 +76,98 @@ function renderNavItems({ items = [], pathname }: { items?: NavItemConfig[]; pat
   const children = items.reduce((acc: React.ReactNode[], curr: NavItemConfig): React.ReactNode[] => {
     const { key, ...item } = curr;
 
-    acc.push(<NavItem key={key} pathname={pathname} {...item} />);
+    acc.push(<MuiListNavItem key={key} pathname={pathname} {...item} />);
 
     return acc;
   }, []);
 
   return (
-    <Stack component="ul" spacing={1} sx={{ listStyle: "none", m: 0, p: 0 }}>
+    <Stack component="ul" sx={{ listStyle: "none", m: 0, p: 0 }}>
       {children}
     </Stack>
   );
 }
 
-interface NavItemProps extends Omit<NavItemConfig, "items"> {
+interface NavItemProps extends NavItemConfig {
   pathname: string;
+}
+
+function omit(key: any, obj: any) {
+  const { [key]: omitted, ...rest } = obj;
+  return rest;
+}
+
+function MuiListNavItem({ disabled, external, href, icon, matcher, pathname, title, items }: NavItemProps): React.JSX.Element {
+  const active = isNavItemActive({ disabled, external, href, matcher, pathname });
+  const Icon = icon ? navIcons[icon] : null;
+
+  return (
+    <>
+      <ListItemButton
+        sx={{
+          borderRadius: 1,
+          p: "4px 8px",
+          mt: 0.2,
+          color: "var(--NavItem-color)",
+          cursor: "pointer",
+          ...(disabled && {
+            bgcolor: "var(--NavItem-disabled-background)",
+            color: "var(--NavItem-disabled-color)",
+            cursor: "not-allowed",
+          }),
+          "&:hover": {
+            backgroundColor: active ? "var(--NavItem-active-background)" : "#ffffff12",
+          },
+          ...(active && { bgcolor: "var(--NavItem-active-background)", color: "var(--NavItem-active-color)" }),
+        }}
+      >
+        <ListItemText>
+          <Box
+            {...(href
+              ? {
+                  component: external ? "a" : RouterLink,
+                  href,
+                  target: external ? "_blank" : undefined,
+                  rel: external ? "noreferrer" : undefined,
+                }
+              : { role: "button" })}
+            sx={{
+              alignItems: "center",
+              borderRadius: 1,
+              color: "var(--NavItem-color)",
+              cursor: "pointer",
+              display: "flex",
+              flex: "0 0 auto",
+              gap: 1,
+              position: "relative",
+              textDecoration: "none",
+              whiteSpace: "nowrap",
+              ...(disabled && {
+                bgcolor: "var(--NavItem-disabled-background)",
+                color: "var(--NavItem-disabled-color)",
+                cursor: "not-allowed",
+              }),
+              ...(active && { color: "var(--NavItem-active-color)" }),
+            }}
+          >
+            <Box sx={{ alignItems: "center", display: "flex", justifyContent: "center", flex: "0 0 auto" }}>{Icon ? <Icon /> : null}</Box>
+            <Box sx={{ flex: "1 1 auto" }}>
+              <Typography component="span" sx={{ color: "inherit", fontSize: "0.875rem", fontWeight: 500, lineHeight: "28px" }}>
+                {title}
+              </Typography>
+            </Box>
+          </Box>
+        </ListItemText>
+      </ListItemButton>
+      {items && (
+        <List dense={true} sx={{ m: "0 0 0 20px", p: 0 }}>
+          {items.map((item: NavItemConfig, index: any) => (
+            <MuiListNavItem key={index} pathname={pathname} {...omit("key", { ...item })} />
+          ))}
+        </List>
+      )}
+    </>
+  );
 }
 
 function NavItem({ disabled, external, href, icon, matcher, pathname, title }: NavItemProps): React.JSX.Element {

@@ -3,40 +3,37 @@
 import * as React from "react";
 
 import Box from "@mui/material/Box";
+import Chip from "@mui/material/Chip";
 import Table from "@mui/material/Table";
+import Stack from "@mui/material/Stack";
+import Paper from "@mui/material/Paper";
+import Button from "@mui/material/Button";
+import TableRow from "@mui/material/TableRow";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
-import Stack from "@mui/material/Stack";
-import IconButton from "@mui/material/IconButton";
-import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit";
+import TableContainer from "@mui/material/TableContainer";
 
 import getFormattedTime from "../../../lib/utils";
 import { scraperClient } from "../../../lib/client";
 
-import { useRouter, useParams } from "next/navigation";
-import { paths } from "../../../paths";
+import { useParams } from "next/navigation";
+import { FullPageLoader } from "../../core/loaders";
 
 export function JobList(): React.JSX.Element {
-  const router = useRouter();
   const params = useParams();
-  const { slug } = params;
+  const { slog } = params;
 
   const [isPending, setIsPending] = React.useState<boolean>(false);
   const [jobsListData, setJobsListData] = React.useState([]);
-  const [selectedRow, setSelectedRow] = React.useState({});
+  const [appliedJobs, setAppliedJobs] = React.useState<string[]>([]);
 
   React.useEffect(() => {
-    console.log(slug);
     async function fetchMyAPI() {
-      if (slug !== undefined) {
+      if (slog !== undefined) {
         setIsPending(true);
-        const { data, error }: any = await scraperClient.getJobs(slug);
+        const { data, error }: any = await scraperClient.getJobs(slog);
 
         if (error) {
           console.log("error", error);
@@ -44,18 +41,38 @@ export function JobList(): React.JSX.Element {
           return;
         }
 
+        setIsPending(false);
         if (data) setJobsListData(data);
       }
     }
 
     fetchMyAPI();
-  }, []);
+  }, [slog]);
 
-  function editResumeReview(e: any) {
-    const review_id = e.currentTarget.getAttribute("data-id");
+  async function jobApply(job_id = "") {
+    setIsPending(true);
+    const { data, error }: any = await scraperClient.saveJobApply(slog, job_id);
 
-    router.replace(paths.builder.resumeReview + review_id);
+    if (error) {
+      console.log("error", error);
+      setIsPending(false);
+      return;
+    }
+
+    if (data) {
+      let updated_jobs_list = appliedJobs;
+      updated_jobs_list.push(job_id);
+      setAppliedJobs(updated_jobs_list);
+      setIsPending(false);
+    }
+
+    setIsPending(false);
   }
+
+  const saveJobApply = (e: any) => {
+    const job_id = e.currentTarget.getAttribute("data-id");
+    jobApply(job_id);
+  };
 
   return (
     <Box
@@ -74,41 +91,50 @@ export function JobList(): React.JSX.Element {
               <TableRow>
                 <TableCell>Actions</TableCell>
                 <TableCell>Company Info</TableCell>
-                <TableCell align="right">Job Title</TableCell>
-                <TableCell align="right">Posted Date</TableCell>
-                <TableCell align="right">Application count</TableCell>
-                <TableCell align="right">Relevance score</TableCell>
-                <TableCell align="right">Match Percent</TableCell>
-                <TableCell align="right">Matched Skills</TableCell>
-                <TableCell align="right">Unmatched Skills</TableCell>
+                <TableCell>Job Title</TableCell>
+                <TableCell>Posted Date</TableCell>
+                <TableCell>Application count</TableCell>
+                <TableCell>Relevance score</TableCell>
+                <TableCell>Match Percent</TableCell>
+                <TableCell>Matched Skills</TableCell>
+                <TableCell>Unmatched Skills</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {jobsListData.map((row: any) => (
-                <TableRow key={row.job_id} sx={{ "&:last-child td, &:last-child th": { border: 0 } }} onClick={() => setSelectedRow(row)}>
+                <TableRow key={row.job_id} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
                   <TableCell align="right">
-                    <Stack direction="row" alignItems="center" spacing={1}>
-                      <IconButton aria-label="delete" size="small" data-id={row.review_id} onClick={editResumeReview}>
-                        <EditIcon fontSize="small" />
-                      </IconButton>
-                      <IconButton aria-label="delete" size="small">
-                        <DeleteIcon fontSize="small" />
-                      </IconButton>
+                    <Stack alignItems="center" spacing={1}>
+                      <Button variant="contained" size="small" href={row.linkedin_url}>
+                        View
+                      </Button>
+                      <Button variant="contained" size="small" data-id={row.job_id} onClick={saveJobApply} disabled={row.is_applied || appliedJobs.indexOf(row.job_id) >= 0}>
+                        Applied
+                      </Button>
                     </Stack>
                   </TableCell>
                   <TableCell component="th" scope="row">
-                    <a href={row.linkedin_url}>
-                      {row.company_name} - {row.company_category}
-                    </a>
-                    {row.job_id} - {row.company_emp_count} employees
+                    <b>{row.company_name}</b>
+                    <br />
+                    {row.company_category}
+                    <br />
+                    {row.company_emp_count} employees
                   </TableCell>
                   <TableCell>{row.job_title}</TableCell>
                   <TableCell>{row.posted_date}</TableCell>
                   <TableCell>{row.applicant_count}</TableCell>
                   <TableCell>{row.relevance_score}</TableCell>
                   <TableCell>{row.match_percent}</TableCell>
-                  <TableCell>{row.matched_skills}</TableCell>
-                  <TableCell>{row.unmatched_skills}</TableCell>
+                  <TableCell>
+                    <Typography variant="body2" color="green">
+                      {row.matched_skills.join(", ")}
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="body2" color="orange">
+                      {row.unmatched_skills.join(", ")}
+                    </Typography>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -121,6 +147,7 @@ export function JobList(): React.JSX.Element {
           </Typography>
         </Stack>
       )}
+      <FullPageLoader isLoading={isPending}></FullPageLoader>
     </Box>
   );
 }

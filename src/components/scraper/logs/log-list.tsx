@@ -4,6 +4,7 @@ import * as React from "react";
 
 import Box from "@mui/material/Box";
 import Table from "@mui/material/Table";
+import Button from "@mui/material/Button";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
@@ -12,8 +13,6 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
-import IconButton from "@mui/material/IconButton";
-import EditIcon from "@mui/icons-material/Edit";
 
 import getFormattedTime from "../../../lib/utils";
 import { scraperClient } from "../../../lib/client";
@@ -49,7 +48,7 @@ export function LogList(): React.JSX.Element {
   function showJobs(e: any) {
     const log_id = e.currentTarget.getAttribute("data-id");
 
-    router.replace(paths.scraper.jobs + log_id);
+    router.replace(paths.scraper.jobs + "/" + log_id);
   }
 
   return (
@@ -80,9 +79,9 @@ export function LogList(): React.JSX.Element {
                   </TableCell>
                   <TableCell>{row.details}</TableCell>
                   <TableCell align="right">
-                    <IconButton aria-label="delete" size="small" data-id={row.uuid} onClick={showJobs}>
-                      <EditIcon fontSize="small" />
-                    </IconButton>
+                    <Button variant="contained" size="small" data-id={row.uuid} onClick={showJobs}>
+                      Show Jobs
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}

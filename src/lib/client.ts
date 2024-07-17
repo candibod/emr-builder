@@ -457,6 +457,20 @@ class ScraperClient {
         return { error: error.message };
       });
   }
+
+  async saveJobApply(log_id: any, job_id: any): Promise<{ data?: ApiResponse; error?: string }> {
+    return apiRequestHandler("scraper/job-apply", "POST", { job_id: job_id, log_id: log_id[0] })
+      .then((response) => {
+        if (response.ok) {
+          return { data: response.data };
+        } else {
+          return { error: response.message };
+        }
+      })
+      .catch((error) => {
+        return { error: error.message };
+      });
+  }
 }
 
 export const authClient = new AuthClient();
