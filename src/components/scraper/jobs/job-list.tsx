@@ -26,8 +26,10 @@ export function JobList(): React.JSX.Element {
   const { slog } = params;
 
   const [isPending, setIsPending] = React.useState<boolean>(false);
-  const [jobsListData, setJobsListData] = React.useState([]);
+  const [jobsListData, setJobsListData] = React.useState<any>([]);
   const [appliedJobs, setAppliedJobs] = React.useState<string[]>([]);
+  const [order, setOrder] = React.useState<string>("asc");
+  const [orderBy, setOrderBy] = React.useState<string>("index");
 
   React.useEffect(() => {
     async function fetchMyAPI() {
@@ -42,7 +44,13 @@ export function JobList(): React.JSX.Element {
         }
 
         setIsPending(false);
-        if (data) setJobsListData(data);
+        let updated_data: any = [];
+        data.forEach((job: any, index: any) => {
+          let temp = job;
+          temp["index"] = index;
+          updated_data.push(temp);
+        });
+        if (data) setJobsListData(updated_data);
       }
     }
 
@@ -74,6 +82,41 @@ export function JobList(): React.JSX.Element {
     jobApply(job_id);
   };
 
+  const handleSort = (orderBy: any, order: any) => {
+    setOrder(order);
+    setOrderBy(orderBy);
+  };
+
+  function stableSort<T>(array: T[], comparator: (a: T, b: T) => number) {
+    const stabilizedThis = array.map((el, index) => [el, index] as [T, number]);
+    stabilizedThis.sort((a, b) => {
+      const order = comparator(a[0], b[0]);
+      if (order !== 0) {
+        return order;
+      }
+      return a[1] - b[1];
+    });
+    return stabilizedThis.map((el) => el[0]);
+  }
+
+  function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
+    if (b[orderBy] < a[orderBy]) {
+      return -1;
+    }
+    if (b[orderBy] > a[orderBy]) {
+      return 1;
+    }
+    return 0;
+  }
+
+  type Order = "asc" | "desc";
+
+  function getComparator<Key extends keyof any>(order: string, orderBy: Key): (a: { [key in Key]: number | string }, b: { [key in Key]: number | string }) => number {
+    return order === "desc" ? (a, b) => descendingComparator(a, b, orderBy) : (a, b) => -descendingComparator(a, b, orderBy);
+  }
+
+  const visibleRows = React.useMemo(() => stableSort(jobsListData, getComparator(order, orderBy)), [jobsListData, order, orderBy]);
+
   return (
     <Box
       sx={{
@@ -84,24 +127,24 @@ export function JobList(): React.JSX.Element {
         borderRadius: "30px",
       }}
     >
-      {jobsListData.length > 0 ? (
+      {visibleRows.length > 0 ? (
         <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 650 }} aria-label="simple table">
+          <Table stickyHeader sx={{ minWidth: 650 }} aria-label="simple table">
             <TableHead>
               <TableRow>
-                <TableCell>Actions</TableCell>
+                <TableCell onClick={() => handleSort("index", "asc")}>Actions</TableCell>
                 <TableCell>Company Info</TableCell>
                 <TableCell>Job Title</TableCell>
-                <TableCell>Posted Date</TableCell>
-                <TableCell>Application count</TableCell>
+                <TableCell onClick={() => handleSort("posted_date", "desc")}>Posted Date</TableCell>
+                <TableCell onClick={() => handleSort("applicant_count", "desc")}>Application count</TableCell>
                 <TableCell>Relevance score</TableCell>
-                <TableCell>Match Percent</TableCell>
+                <TableCell onClick={() => handleSort("match_percent", "desc")}>Match Percent</TableCell>
                 <TableCell>Matched Skills</TableCell>
                 <TableCell>Unmatched Skills</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {jobsListData.map((row: any) => (
+              {visibleRows.map((row: any) => (
                 <TableRow key={row.job_id} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
                   <TableCell align="right">
                     <Stack alignItems="center" spacing={1}>
