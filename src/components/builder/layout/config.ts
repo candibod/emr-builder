@@ -9,8 +9,9 @@ export const navItems = [
     icon: "description",
     items: [
       { key: "New Job", title: "New Job", href: paths.builder.newJob, icon: "new-note" },
-      { key: "Resume Reviews", title: "Resume Reviews", href: paths.builder.resumeReviews, icon: "reviews" },
+      { key: "Resume Reviews", title: "Resume Reviews", href: paths.builder.resumeReviews, icon: "description" },
       { key: "Upload Resume", title: "Upload Resume", href: paths.builder.uploadResume, icon: "upload-file" },
+      { key: "Resume Uploads", title: "Resume Uploads", href: paths.builder.uploadsList, icon: "reviews" },
     ],
   },
   {

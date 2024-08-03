@@ -105,7 +105,7 @@ async function apiRequestHandler(url: string, method: string, body?: object, hea
 
   const res = await response.json();
 
-  api_response["ok"] = true;
+  api_response["ok"] = res.success;
   api_response["message"] = res.message;
   api_response["data"] = res.data;
 
@@ -321,6 +321,20 @@ class ResumeClient {
       });
   }
 
+  async deleteResume(resume_id: string): Promise<{ data?: ApiResponse; error?: string }> {
+    return apiRequestHandler("resume/delete-resume", "DELETE", { resume_id: resume_id })
+      .then((response) => {
+        if (response.ok) {
+          return { data: response.data };
+        } else {
+          return { error: response.message };
+        }
+      })
+      .catch((error) => {
+        return { error: error.message };
+      });
+  }
+
   async getMatchStats(params: GetMatchStatsParams): Promise<{ data?: ApiResponse; error?: string }> {
     const { job_description, job_role, job_url, company_name } = params;
 
@@ -341,6 +355,20 @@ class ResumeClient {
     const { resume_id, builder_id } = params;
 
     return apiRequestHandler("resume/job-details", "PUT", { resume_uuid: resume_id, builder_uuid: builder_id })
+      .then((response) => {
+        if (response.ok) {
+          return { data: response.data };
+        } else {
+          return { error: response.message };
+        }
+      })
+      .catch((error) => {
+        return { error: error.message };
+      });
+  }
+
+  async getUploadedResumes(): Promise<{ data?: ApiResponse; error?: string }> {
+    return apiRequestHandler("resume/uploads", "GET")
       .then((response) => {
         if (response.ok) {
           return { data: response.data };
@@ -396,7 +424,6 @@ class ResumeClient {
   }
 
   async updateResume(builder_uuid: string, action: string, resume_data: EditResumeParams): Promise<{ data?: ApiResponse; error?: string }> {
-    console.log("params", action, resume_data);
     const payload = { builder_uuid: builder_uuid, action: action, action_data: { index: resume_data.index, bullet_id: resume_data.bullet_id, data: resume_data.data } };
 
     return apiRequestHandler("resume/update-resume", "POST", payload)

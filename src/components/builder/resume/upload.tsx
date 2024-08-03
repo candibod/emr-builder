@@ -1,6 +1,8 @@
 "use client";
 
 import * as React from "react";
+import { paths } from "../../../paths";
+import { useRouter } from "next/navigation";
 
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
@@ -17,6 +19,7 @@ import { resumeClient } from "../../../lib/client";
 
 export function UploadResume(): React.JSX.Element {
   const [file, setFile] = React.useState(null);
+  const router = useRouter();
 
   const handleSubmit = async (event: any) => {
     event.preventDefault();
@@ -28,7 +31,10 @@ export function UploadResume(): React.JSX.Element {
       return;
     }
 
-    if (data) console.log(data);
+    if (data) {
+      window.alert("Resume Uploaded Successfully!");
+      router.replace(paths.builder.uploadsList);
+    }
   };
 
   return (

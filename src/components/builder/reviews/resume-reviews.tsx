@@ -68,17 +68,24 @@ export function ResumeReviews(): React.JSX.Element {
           <Table sx={{ minWidth: 650 }} aria-label="simple table">
             <TableHead>
               <TableRow>
-                <TableCell>Actions</TableCell>
-                <TableCell>Company Name - (URL)</TableCell>
+                <TableCell>Company Details</TableCell>
                 <TableCell align="right">Job Role</TableCell>
                 <TableCell align="right">Match Percentage</TableCell>
                 <TableCell align="right">Resume Name</TableCell>
                 <TableCell align="right">Updated At</TableCell>
+                <TableCell>Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {resumeReviewsData.map((row: any) => (
                 <TableRow key={row.review_id} sx={{ "&:last-child td, &:last-child th": { border: 0 } }} onClick={() => setSelectedRow(row)}>
+                  <TableCell component="th" scope="row">
+                    <a href={row.job_url}>{row.company_name}</a>
+                  </TableCell>
+                  <TableCell align="right">{row.job_role}</TableCell>
+                  <TableCell align="right">{row.match_percentage}</TableCell>
+                  <TableCell align="right">{row.resume_name}</TableCell>
+                  <TableCell align="right">{getFormattedTime(row.updated_at)}</TableCell>
                   <TableCell align="right">
                     <Stack direction="row" alignItems="center" spacing={1}>
                       <IconButton aria-label="delete" size="small" data-id={row.review_id} onClick={editResumeReview}>
@@ -89,16 +96,6 @@ export function ResumeReviews(): React.JSX.Element {
                       </IconButton>
                     </Stack>
                   </TableCell>
-                  <TableCell component="th" scope="row">
-                    {row.company_name} -
-                    <a href={row.job_url}>
-                      <div style={{ overflow: "hidden", textOverflow: "ellipsis", width: "11rem", whiteSpace: "nowrap" }}>{"(" + row.job_url + ")"}</div>
-                    </a>
-                  </TableCell>
-                  <TableCell align="right">{row.job_role}</TableCell>
-                  <TableCell align="right">{row.match_percentage}</TableCell>
-                  <TableCell align="right">{row.resume_name}</TableCell>
-                  <TableCell align="right">{getFormattedTime(row.updated_at)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

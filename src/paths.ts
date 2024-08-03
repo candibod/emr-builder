@@ -11,6 +11,7 @@ export const paths = {
     resumeReviews: "/builder/resume-reviews",
     resumeReview: "/builder/resume-review/",
     uploadResume: "/builder/upload-resume",
+    uploadsList: "/builder/uploads-list",
     account: "/builder/account",
   },
   scraper: {

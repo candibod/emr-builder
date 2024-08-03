@@ -56,7 +56,9 @@ export function NewJob(): React.JSX.Element {
         return;
       }
 
-      if (data) setJobStatsData(data);
+      if (data) {
+        setJobStatsData(data);
+      }
     },
     [setError]
   );
