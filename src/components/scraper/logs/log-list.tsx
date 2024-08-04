@@ -63,10 +63,10 @@ export function LogList(): React.JSX.Element {
     >
       {jobsListData.length > 0 ? (
         <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 650 }} aria-label="simple table">
+          <Table sx={{ minWidth: 650 }} size="small" aria-label="simple table">
             <TableHead>
               <TableRow>
-                <TableCell>Created At</TableCell>
+                <TableCell>Scraped At</TableCell>
                 <TableCell>Info</TableCell>
                 <TableCell align="right">Actions</TableCell>
               </TableRow>

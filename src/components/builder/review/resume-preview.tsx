@@ -153,8 +153,6 @@ export function ResumePreview({ resumeDetails, matchedSkills, bulletEditStatus, 
     console.log(newBulletPointsList);
   }
 
-  console.log("render");
-
   function handleClickAction(action: string) {
     SetUserAction({ state: action, bullet: "", id: "" });
   }
@@ -255,7 +253,7 @@ export function ResumePreview({ resumeDetails, matchedSkills, bulletEditStatus, 
             </Box>
             <Box>
               {resume.experience.map((experience, exp_index) => (
-                <Box key={experience.name}>
+                <Box key={"exp_bullets" + exp_index}>
                   <Box>
                     <Grid container justifyContent="space-between" direction="row">
                       <Box>
@@ -272,7 +270,7 @@ export function ResumePreview({ resumeDetails, matchedSkills, bulletEditStatus, 
                         {experience.bullets.map((bullet, index) => (
                           <Box key={index} sx={{ display: "flex", alignItems: "center", mb: 1, cursor: "pointer" }} onClick={(e) => handleReplaceBullet(e, "exp_" + exp_index + "_" + index)}>
                             <Box component="img" alt="Widgets" src="/assets/replace.png" sx={{ height: "100%", width: "100%", maxWidth: "20px", cursor: "pointer", marginRight: 2 }} />
-                            <span dangerouslySetInnerHTML={{ __html: highlight_text(bullet) }} key={bullet}></span>
+                            <span dangerouslySetInnerHTML={{ __html: highlight_text(bullet) }} key={index}></span>
                           </Box>
                         ))}
                       </>
@@ -287,7 +285,7 @@ export function ResumePreview({ resumeDetails, matchedSkills, bulletEditStatus, 
                               onClick={(e) => handleDeleteBullet(e, "exp", exp_index, index)}
                               sx={{ height: "100%", width: "100%", maxWidth: "20px", cursor: "pointer", marginRight: "10px" }}
                             />
-                            <span dangerouslySetInnerHTML={{ __html: highlight_text(bullet) }} key={bullet}></span>
+                            <span dangerouslySetInnerHTML={{ __html: highlight_text(bullet) }} key={index}></span>
                           </Box>
                         ))}
                       </>
@@ -327,8 +325,8 @@ export function ResumePreview({ resumeDetails, matchedSkills, bulletEditStatus, 
 
                     {(userAction.state === "add" || userAction.state === "") && (
                       <>
-                        {experience.bullets.map((bullet) => (
-                          <p dangerouslySetInnerHTML={{ __html: highlight_text(bullet) }} key={bullet}></p>
+                        {experience.bullets.map((bullet, index) => (
+                          <p dangerouslySetInnerHTML={{ __html: highlight_text(bullet) }} key={index}></p>
                         ))}
                       </>
                     )}

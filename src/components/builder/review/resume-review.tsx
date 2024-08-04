@@ -434,8 +434,12 @@ export function ResumeReview(): React.JSX.Element {
                     <Alert icon={false} severity="info">
                       {generatedText.bullet}
                       <Stack spacing={2} direction="row" sx={{ mt: 2, justifyContent: "center" }}>
-                        <Button variant="outlined">Add</Button>
-                        <Button variant="outlined">Replace</Button>
+                        <Button variant="outlined" data-id={generatedText.id} onClick={handleBulletClickAdd}>
+                          Add
+                        </Button>
+                        <Button variant="outlined" data-id={generatedText.id} onClick={handleBulletClickReplace}>
+                          Replace
+                        </Button>
                       </Stack>
                     </Alert>
                   </Box>

@@ -3,19 +3,22 @@
 import * as React from "react";
 
 import Box from "@mui/material/Box";
-import Chip from "@mui/material/Chip";
 import Table from "@mui/material/Table";
 import Stack from "@mui/material/Stack";
-import Paper from "@mui/material/Paper";
+import Dialog from "@mui/material/Dialog";
 import Button from "@mui/material/Button";
 import TableRow from "@mui/material/TableRow";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import Typography from "@mui/material/Typography";
+import DialogTitle from "@mui/material/DialogTitle";
+import ButtonGroup from "@mui/material/ButtonGroup";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
 import TableContainer from "@mui/material/TableContainer";
+import DialogContentText from "@mui/material/DialogContentText";
 
-import getFormattedTime from "../../../lib/utils";
 import { scraperClient } from "../../../lib/client";
 
 import { useParams } from "next/navigation";
@@ -30,12 +33,14 @@ export function JobList(): React.JSX.Element {
   const [appliedJobs, setAppliedJobs] = React.useState<string[]>([]);
   const [order, setOrder] = React.useState<string>("asc");
   const [orderBy, setOrderBy] = React.useState<string>("index");
+  const [open, setOpen] = React.useState(false);
+  const [selectedRow, setSelectedRow] = React.useState<any>({});
 
   React.useEffect(() => {
     async function fetchMyAPI() {
       if (slog !== undefined) {
         setIsPending(true);
-        const { data, error }: any = await scraperClient.getJobs(slog);
+        const { data, error }: any = await scraperClient.getJobsFromLogs(slog);
 
         if (error) {
           console.log("error", error);
@@ -87,6 +92,15 @@ export function JobList(): React.JSX.Element {
     setOrderBy(orderBy);
   };
 
+  const ShowStatsModel = (row: any) => {
+    setSelectedRow(row);
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
   function stableSort<T>(array: T[], comparator: (a: T, b: T) => number) {
     const stabilizedThis = array.map((el, index) => [el, index] as [T, number]);
     stabilizedThis.sort((a, b) => {
@@ -121,6 +135,7 @@ export function JobList(): React.JSX.Element {
     <Box
       sx={{
         width: "calc(100% - 20px)",
+        overflowY: "scroll",
         background: "white",
         p: 3,
         margin: "10px 10px 10px 10px",
@@ -128,34 +143,24 @@ export function JobList(): React.JSX.Element {
       }}
     >
       {visibleRows.length > 0 ? (
-        <TableContainer component={Paper}>
-          <Table stickyHeader sx={{ minWidth: 650 }} aria-label="simple table">
+        <TableContainer sx={{ maxHeight: "calc(100vh - 140px)" }}>
+          <Table stickyHeader sx={{ minWidth: 650 }} size="small" aria-label="simple table">
             <TableHead>
               <TableRow>
-                <TableCell onClick={() => handleSort("index", "asc")}>Actions</TableCell>
                 <TableCell>Company Info</TableCell>
                 <TableCell>Job Title</TableCell>
                 <TableCell onClick={() => handleSort("posted_date", "desc")}>Posted Date</TableCell>
                 <TableCell onClick={() => handleSort("applicant_count", "desc")}>Application count</TableCell>
                 <TableCell>Relevance score</TableCell>
                 <TableCell onClick={() => handleSort("match_percent", "desc")}>Match Percent</TableCell>
-                <TableCell>Matched Skills</TableCell>
-                <TableCell>Unmatched Skills</TableCell>
+                <TableCell align="center" onClick={() => handleSort("index", "asc")}>
+                  Actions
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {visibleRows.map((row: any) => (
                 <TableRow key={row.job_id} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
-                  <TableCell align="right">
-                    <Stack alignItems="center" spacing={1}>
-                      <Button variant="contained" size="small" href={row.linkedin_url}>
-                        View
-                      </Button>
-                      <Button variant="contained" size="small" data-id={row.job_id} onClick={saveJobApply} disabled={row.is_applied || appliedJobs.indexOf(row.job_id) >= 0}>
-                        Applied
-                      </Button>
-                    </Stack>
-                  </TableCell>
                   <TableCell component="th" scope="row">
                     <b>{row.company_name}</b>
                     <br />
@@ -168,15 +173,22 @@ export function JobList(): React.JSX.Element {
                   <TableCell>{row.applicant_count}</TableCell>
                   <TableCell>{row.relevance_score}</TableCell>
                   <TableCell>{row.match_percent}</TableCell>
-                  <TableCell>
-                    <Typography variant="body2" color="green">
-                      {row.matched_skills.join(", ")}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2" color="orange">
-                      {row.unmatched_skills.join(", ")}
-                    </Typography>
+                  <TableCell align="center">
+                    <ButtonGroup size="small" aria-label="Small button group">
+                      <Button target="_blank" href={row.linkedin_url}>
+                        View
+                      </Button>
+                      {appliedJobs.indexOf(row.job_id) >= 0 || row.is_applied ? (
+                        <></>
+                      ) : (
+                        <Button data-id={row.job_id} sx={{ whiteSpace: "nowrap" }} onClick={saveJobApply}>
+                          Mark Applied
+                        </Button>
+                      )}
+                      <Button data-id={row.job_id} sx={{ whiteSpace: "nowrap" }} onClick={() => ShowStatsModel(row)}>
+                        Skills Stats
+                      </Button>
+                    </ButtonGroup>
                   </TableCell>
                 </TableRow>
               ))}
@@ -191,6 +203,22 @@ export function JobList(): React.JSX.Element {
         </Stack>
       )}
       <FullPageLoader isLoading={isPending}></FullPageLoader>
+      <Dialog fullWidth={true} maxWidth="md" open={open} onClose={handleClose}>
+        <DialogTitle>Skills Match Stats</DialogTitle>
+        <DialogContent>
+          <DialogContentText>Matched Skills</DialogContentText>
+          <Typography variant="body2" color="green">
+            {selectedRow.matched_skills ? selectedRow.matched_skills.join(", ") : <>No Matching Records.</>}
+          </Typography>
+          <DialogContentText sx={{ mt: 3 }}>Unmatched Skills</DialogContentText>
+          <Typography variant="body2" color="orange">
+            {selectedRow.unmatched_skills ? selectedRow.unmatched_skills.join(", ") : <>No Matching Records.</>}
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>Close</Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

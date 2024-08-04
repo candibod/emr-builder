@@ -471,8 +471,22 @@ class ScraperClient {
       });
   }
 
-  async getJobs(id: any): Promise<{ data?: ApiResponse; error?: string }> {
+  async getJobsFromLogs(id: any): Promise<{ data?: ApiResponse; error?: string }> {
     return apiRequestHandler("scraper/jobs/" + id, "GET")
+      .then((response) => {
+        if (response.ok) {
+          return { data: response.data };
+        } else {
+          return { error: response.message };
+        }
+      })
+      .catch((error) => {
+        return { error: error.message };
+      });
+  }
+
+  async getAppliedJobs(): Promise<{ data?: ApiResponse; error?: string }> {
+    return apiRequestHandler("scraper/applied-jobs", "GET")
       .then((response) => {
         if (response.ok) {
           return { data: response.data };
@@ -487,6 +501,20 @@ class ScraperClient {
 
   async saveJobApply(log_id: any, job_id: any): Promise<{ data?: ApiResponse; error?: string }> {
     return apiRequestHandler("scraper/job-apply", "POST", { job_id: job_id, log_id: log_id[0] })
+      .then((response) => {
+        if (response.ok) {
+          return { data: response.data };
+        } else {
+          return { error: response.message };
+        }
+      })
+      .catch((error) => {
+        return { error: error.message };
+      });
+  }
+
+  async updateJobStatus(job_id: any, status: any): Promise<{ data?: ApiResponse; error?: string }> {
+    return apiRequestHandler("scraper/job-status", "POST", { job_id: job_id, status: status })
       .then((response) => {
         if (response.ok) {
           return { data: response.data };

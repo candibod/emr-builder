@@ -1,4 +1,8 @@
 export default function getFormattedTime(time: string): string {
+  if (!time || time.length == 0) {
+    return "";
+  }
+
   let strArray = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
   let utcDate = time;
