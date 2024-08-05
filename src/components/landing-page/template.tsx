@@ -8,17 +8,18 @@ import Divider from "@mui/material/Divider";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
+
 import AutoAwesomeRoundedIcon from "@mui/icons-material/AutoAwesomeRounded";
-// import AppAppBar from "./components/AppAppBar";
-// import Hero from "./components/Hero";
+import AppAppBar from "./components/AppAppBar";
+import Hero from "./components/Hero";
 // import LogoCollection from "./components/LogoCollection";
-// import Highlights from "./components/Highlights";
+import Highlights from "./components/Highlights";
 // import Pricing from "./components/Pricing";
-// import Features from "./components/Features";
+import Features from "./components/Features";
 // import Testimonials from "./components/Testimonials";
-// import FAQ from "./components/FAQ";
-// import Footer from "./components/Footer";
-import getLPTheme from "./getLpTheme";
+import FAQ from "./components/FAQ";
+import Footer from "./components/Footer";
+import getLPTheme from "./getLPTheme";
 
 interface ToggleCustomThemeProps {
   showCustomTheme: Boolean;
@@ -77,21 +78,18 @@ export default function LandingPageTemplate() {
   return (
     <ThemeProvider theme={showCustomTheme ? LPtheme : defaultTheme}>
       <CssBaseline />
-      {/* <AppAppBar mode={mode} toggleColorMode={toggleColorMode} /> */}
-      {/* <Hero /> */}
+      <AppAppBar mode={mode} toggleColorMode={toggleColorMode} />
+      <Hero />
       <Box sx={{ bgcolor: "background.default" }}>
-        {/* <LogoCollection /> */}
-        {/* <Features /> */}
+        <Features />
         <Divider />
-        {/* <Testimonials /> */}
-        <Divider />
-        {/* <Highlights /> */}
+        <Highlights />
         <Divider />
         {/* <Pricing /> */}
         <Divider />
-        {/* <FAQ /> */}
+        <FAQ />
         <Divider />
-        {/* <Footer /> */}
+        <Footer />
       </Box>
       <ToggleCustomTheme showCustomTheme={showCustomTheme} toggleCustomTheme={toggleCustomTheme} />
     </ThemeProvider>
