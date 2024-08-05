@@ -1,5 +1,16 @@
-import { redirect } from "next/navigation";
+import * as React from "react";
+import type { Metadata } from "next";
 
-export default function Page(): never {
-  redirect("/auth/login");
+import { config } from "../config";
+import { IdleGuard } from "../components/auth/idle-guard";
+import LandingPageTemplate from "../components/landing-page/template";
+
+export const metadata = { title: `Elevate My Resume` } satisfies Metadata;
+
+export default function Login(): React.JSX.Element {
+  return (
+    <IdleGuard>
+      <LandingPageTemplate />
+    </IdleGuard>
+  );
 }

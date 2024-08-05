@@ -27,7 +27,7 @@ export function Layout({ children }: LayoutProps): React.JSX.Element {
         <Box sx={{ display: "flex", flex: "1 1 auto", flexDirection: "column" }}>
           <Box sx={{ p: 3 }}>
             <Box component={RouterLink} href={paths.home} sx={{ display: "inline-block", fontSize: 0 }}>
-              <DynamicLogo colorDark="light" colorLight="dark" height={60} width={205} />
+              <DynamicLogo colorDark="dark" colorLight="light" height={60} width={205} />
             </Box>
           </Box>
           <Box sx={{ alignItems: "center", display: "flex", flex: "1 1 auto", justifyContent: "center", p: 3 }}>
