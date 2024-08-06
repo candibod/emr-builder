@@ -37,6 +37,7 @@ export function ResumeReviews(): React.JSX.Element {
 
       if (error) {
         console.log("error", error);
+        alert(error);
         setIsPending(false);
         return;
       }

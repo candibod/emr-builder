@@ -10,6 +10,7 @@ import WorkOutlineIcon from "@mui/icons-material/WorkOutline";
 import BuildCircleIcon from "@mui/icons-material/BuildCircle";
 import ManageSearchIcon from "@mui/icons-material/ManageSearch";
 import AssessmentIcon from "@mui/icons-material/Assessment";
+import PollIcon from "@mui/icons-material/Poll";
 import { SvgIconComponent } from "@mui/icons-material";
 
 export const navIcons = {
@@ -19,6 +20,7 @@ export const navIcons = {
   "quick-tools": BuildCircleIcon,
   "get-keywords": ManageSearchIcon,
   "match-score": AssessmentIcon,
+  "job-tracker": PollIcon,
   description: DescriptionIcon,
   reviews: FileCopyOutlinedIcon,
   scraper: WebIcon,

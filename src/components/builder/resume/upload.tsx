@@ -10,6 +10,7 @@ import Button from "@mui/material/Button";
 import Divider from "@mui/material/Divider";
 import Grid from "@mui/material/Unstable_Grid2";
 import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
 import CardHeader from "@mui/material/CardHeader";
 import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
@@ -45,16 +46,24 @@ export function UploadResume(): React.JSX.Element {
         minHeight: "100%",
         alignItems: "center",
         justifyContent: "center",
+        flexDirection: "column",
+        gap: 4,
       }}
     >
       <form onSubmit={(event) => handleSubmit(event)}>
         <Card>
           <CardHeader subheader="Format allowed: pdf" title="Resume Upload" />
           <Divider />
-          <CardContent>
-            <Grid container spacing={3}>
-              <TextField type="file" onChange={(e: any) => setFile(e.target.files[0])}></TextField>
-            </Grid>
+          <CardContent sx={{ p: 3 }}>
+            <Typography variant="body2" sx={{ mb: 3 }}>
+              The algorithm to parse the resume is being written to handle certain type of resume formats, Additional patterns or algorithms will be implemented to improve the accuracy of information
+              extraction.
+            </Typography>
+            <Box sx={{ display: "flex", alignItems: "center", pl: 1, pb: 1 }}>
+              <Grid container spacing={3}>
+                <TextField type="file" onChange={(e: any) => setFile(e.target.files[0])}></TextField>
+              </Grid>
+            </Box>
           </CardContent>
           <Divider />
           <CardActions sx={{ justifyContent: "flex-end" }}>
@@ -64,6 +73,46 @@ export function UploadResume(): React.JSX.Element {
           </CardActions>
         </Card>
       </form>
+      <Box width="100%">
+        <Grid container spacing={2} justifyContent="center" alignItems="center">
+          <Grid xs={6} sm={4} md={2}>
+            <Card>
+              <CardContent>
+                <Typography variant="h5" component="div">
+                  SDE - Entry Level
+                </Typography>
+                <Typography color="text.secondary">0 - 2 years</Typography>
+              </CardContent>
+              <CardActions>
+                <Button size="small" disabled={true}>
+                  View
+                </Button>
+                <Button size="small" href="/assets/sde-entry.pdf" download="SDE-entry.pdf">
+                  Download
+                </Button>
+              </CardActions>
+            </Card>
+          </Grid>
+          <Grid xs={6} sm={4} md={2}>
+            <Card>
+              <CardContent>
+                <Typography variant="h5" component="div">
+                  SDE - Mid Level
+                </Typography>
+                <Typography color="text.secondary">2 - 6 years</Typography>
+              </CardContent>
+              <CardActions>
+                <Button size="small" disabled={true}>
+                  View
+                </Button>
+                <Button size="small" disabled={true}>
+                  Coming Soon..
+                </Button>
+              </CardActions>
+            </Card>
+          </Grid>
+        </Grid>
+      </Box>
     </Box>
   );
 }

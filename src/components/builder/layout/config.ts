@@ -22,6 +22,7 @@ export const navItems = [
     items: [
       { key: "Logs", title: "Logs", href: paths.scraper.logs, icon: "logs" },
       { key: "Jobs", title: "Jobs", href: paths.scraper.jobs, icon: "jobs" },
+      { key: "Job Tracker", title: "Job Tracker", href: paths.scraper.jobTracker, icon: "job-tracker" },
     ],
   },
   {

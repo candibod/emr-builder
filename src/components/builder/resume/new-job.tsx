@@ -31,7 +31,7 @@ const schema = zod.object({
 
 type Values = zod.infer<typeof schema>;
 
-const defaultValues = { job_description: "", job_role: "", job_url: "", company_name: "" } satisfies Values;
+const defaultValues = { job_description: "", job_role: "SDE", job_url: "", company_name: "" } satisfies Values;
 
 export function NewJob(): React.JSX.Element {
   const [isPending, setIsPending] = React.useState<boolean>(false);
@@ -111,7 +111,7 @@ export function NewJob(): React.JSX.Element {
                   render={({ field }) => (
                     <FormControl error={Boolean(errors.job_role)}>
                       <InputLabel>Job Role</InputLabel>
-                      <Select label="Job Role" {...field}>
+                      <Select label="Job Role" {...field} disabled={true}>
                         <MenuItem value={"SDE"}>SDE</MenuItem>
                         <MenuItem value={"20"}>FRONTEND</MenuItem>
                         <MenuItem value={"BACKEND"}>BACKEND</MenuItem>
