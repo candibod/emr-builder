@@ -321,6 +321,20 @@ class ResumeClient {
       });
   }
 
+  async fetchResume(resume_id: string): Promise<{ data?: ApiResponse; error?: string }> {
+    return apiRequestHandler("resume/details/" + resume_id, "GET")
+      .then((response) => {
+        if (response.ok) {
+          return { data: response.data };
+        } else {
+          return { error: response.message };
+        }
+      })
+      .catch((error) => {
+        return { error: error.message };
+      });
+  }
+
   async deleteResume(resume_id: string): Promise<{ data?: ApiResponse; error?: string }> {
     return apiRequestHandler("resume/delete-resume", "DELETE", { resume_id: resume_id })
       .then((response) => {

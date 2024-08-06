@@ -6,19 +6,20 @@ import { useRouter } from "next/navigation";
 import { paths } from "../../../paths";
 
 import Box from "@mui/material/Box";
+import Chip from "@mui/material/Chip";
 import Card from "@mui/material/Card";
 import List from "@mui/material/List";
 import Stack from "@mui/material/Stack";
+import Paper from "@mui/material/Paper";
 import Avatar from "@mui/material/Avatar";
+import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
+import CardHeader from "@mui/material/CardHeader";
 import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
 
-import Button from "@mui/material/Button";
-import Paper from "@mui/material/Paper";
-import Chip from "@mui/material/Chip";
-import CardHeader from "@mui/material/CardHeader";
 import { resumeClient } from "../../../lib/client";
+import getFormattedTime from "../../../lib/utils";
 
 export interface LayoutProps {
   children: React.ReactNode;
@@ -38,7 +39,7 @@ export function NewJobStats(props: any): React.JSX.Element {
       return;
     }
 
-    router.replace(paths.builder.resumeReviews);
+    router.replace(paths.builder.resumeReview + builder_id);
   }
 
   return (
@@ -55,7 +56,7 @@ export function NewJobStats(props: any): React.JSX.Element {
                     </Avatar>
                   }
                   title={resume_stats.resume_name}
-                  subheader={"Updated At: " + resume_stats.updated_at}
+                  subheader={"Updated At: " + getFormattedTime(resume_stats.updated_at)}
                 />
                 <CardContent sx={{ padding: "0px 20px 0px 20px" }}>
                   {resume_stats.found.length > 0 ? (
