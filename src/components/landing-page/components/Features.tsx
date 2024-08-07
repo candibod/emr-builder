@@ -9,31 +9,31 @@ import Link from "@mui/material/Link";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
-import DevicesRoundedIcon from "@mui/icons-material/DevicesRounded";
-import EdgesensorHighRoundedIcon from "@mui/icons-material/EdgesensorHighRounded";
-import ViewQuiltRoundedIcon from "@mui/icons-material/ViewQuiltRounded";
+import AutoAwesomeMotionIcon from "@mui/icons-material/AutoAwesomeMotion";
+import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
+import LeaderboardIcon from "@mui/icons-material/Leaderboard";
 
 const items = [
   {
-    icon: <ViewQuiltRoundedIcon />,
-    title: "Dashboard",
-    description: "This item could provide a snapshot of the most important metrics or data points related to the product.",
-    imageLight: 'url("/static/images/templates/templates-images/dash-light.png")',
-    imageDark: 'url("/static/images/templates/templates-images/dash-dark.png")',
+    icon: <AutoAwesomeMotionIcon />,
+    title: "Smart Resume Matcher",
+    description: "Effortlessly find the best matches from all the resumes you’ve edited, allowing you to select the most suitable options for your applications.",
+    imageLight: 'url("/assets/home/resume-match.png")',
+    imageDark: 'url("/assets/home/resume-match.png")',
   },
   {
-    icon: <EdgesensorHighRoundedIcon />,
-    title: "Mobile integration",
-    description: "This item could provide information about the mobile app version of the product.",
-    imageLight: 'url("/static/images/templates/templates-images/mobile-light.png")',
-    imageDark: 'url("/static/images/templates/templates-images/mobile-dark.png")',
+    icon: <VolunteerActivismIcon />,
+    title: "User-Friendly Interface",
+    description: "Enjoy a user-friendly interface that makes navigation and editing a breeze, simplifying your job application process.",
+    imageLight: 'url("/assets/home/ui.png")',
+    imageDark: 'url("/assets/home/ui.png")',
   },
   {
-    icon: <DevicesRoundedIcon />,
-    title: "Available on all platforms",
-    description: "This item could let users know the product is available on all platforms, such as web, mobile, and desktop.",
-    imageLight: 'url("/static/images/templates/templates-images/devices-light.png")',
-    imageDark: 'url("/static/images/templates/templates-images/devices-dark.png")',
+    icon: <LeaderboardIcon />,
+    title: "Job Tracker",
+    description: "Minimize the hassle of job searching by efficiently tracking and filtering through hundreds of job listings, making your search more streamlined and effective.",
+    imageLight: 'url("/assets/home/job-tracker.png")',
+    imageDark: 'url("/assets/home/job-tracker.png")',
   },
 ];
 
@@ -55,8 +55,7 @@ export default function Features() {
               Product features
             </Typography>
             <Typography variant="body1" color="text.secondary" sx={{ mb: { xs: 2, sm: 4 } }}>
-              Here you can provide a brief overview of the key features of the product. For example, you could list the number of features, the types of features, add-ons, or the benefits of the
-              features.
+              A brief overview of the key features of the product.
             </Typography>
           </div>
           <Grid container item gap={1} sx={{ display: { xs: "auto", sm: "none" } }}>
@@ -214,6 +213,7 @@ export default function Features() {
                 width: 420,
                 height: 500,
                 backgroundSize: "contain",
+                backgroundRepeat: "no-repeat",
                 backgroundImage: (theme) => (theme.palette.mode === "light" ? items[selectedItemIndex].imageLight : items[selectedItemIndex].imageDark),
               }}
             />

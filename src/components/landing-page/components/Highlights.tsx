@@ -4,51 +4,59 @@ import Card from "@mui/material/Card";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 import Stack from "@mui/material/Stack";
+import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
-import AutoFixHighRoundedIcon from "@mui/icons-material/AutoFixHighRounded";
-import ConstructionRoundedIcon from "@mui/icons-material/ConstructionRounded";
-import QueryStatsRoundedIcon from "@mui/icons-material/QueryStatsRounded";
-import SettingsSuggestRoundedIcon from "@mui/icons-material/SettingsSuggestRounded";
-import SupportAgentRoundedIcon from "@mui/icons-material/SupportAgentRounded";
-import ThumbUpAltRoundedIcon from "@mui/icons-material/ThumbUpAltRounded";
+
+import FileCopyIcon from "@mui/icons-material/FileCopy";
+import ContactMailIcon from "@mui/icons-material/ContactMail";
+import CategoryIcon from "@mui/icons-material/Category";
+import AdsClickIcon from "@mui/icons-material/AdsClick";
+import TuneIcon from "@mui/icons-material/Tune";
+import ModelTrainingIcon from "@mui/icons-material/ModelTraining";
+import DashboardIcon from "@mui/icons-material/Dashboard";
 
 const items = [
   {
-    icon: <SettingsSuggestRoundedIcon />,
-    title: "Adaptable performance",
-    description: "Our product effortlessly adjusts to your needs, boosting efficiency and simplifying your tasks.",
+    icon: <ContactMailIcon />,
+    title: "Contact Recruiter",
+    description: "Easily connect and communicate directly with recruiters with pre-filled templates.",
   },
   {
-    icon: <ConstructionRoundedIcon />,
-    title: "Built to last",
-    description: "Experience unmatched durability that goes above and beyond with lasting investment.",
+    icon: <DashboardIcon />,
+    title: "Dashboard",
+    description: "A dashboard to display job application metrics and summarize results for actionable insights.",
   },
   {
-    icon: <ThumbUpAltRoundedIcon />,
-    title: "Great user experience",
-    description: "Integrate our product into your routine with an intuitive and easy-to-use interface.",
+    icon: <CategoryIcon />,
+    title: "Categorize Skills",
+    description: "Efficiently organize skills into distinct technical and non-technical categories.",
   },
   {
-    icon: <AutoFixHighRoundedIcon />,
-    title: "Innovative functionality",
-    description: "Stay ahead with features that set new standards, addressing your evolving needs better than the rest.",
+    icon: <AdsClickIcon />,
+    title: "One click Enhance",
+    description: "Instantly improve and optimize your resume with just one click.",
   },
   {
-    icon: <SupportAgentRoundedIcon />,
-    title: "Reliable support",
-    description: "Count on our responsive customer support, offering assistance that goes beyond the purchase.",
+    icon: <TuneIcon />,
+    title: "Custom Scraper",
+    description: "Create a customized scraper tailored to match your specific job requirements.",
   },
   {
-    icon: <QueryStatsRoundedIcon />,
-    title: "Precision in every detail",
-    description: "Enjoy a meticulously crafted product where small touches make a significant impact on your overall experience.",
+    icon: <FileCopyIcon />,
+    title: "Additional Templates/Roles",
+    description: "Gain access to a variety of resume templates designed for different roles.",
+  },
+  {
+    icon: <ModelTrainingIcon />,
+    title: "Upgrade Scraping using ML",
+    description: "Enhance the effectiveness of scraping by utilizing machine learning techniques.",
   },
 ];
 
 export default function Highlights() {
   return (
     <Box
-      id="highlights"
+      id="roadmap"
       sx={{
         pt: { xs: 4, sm: 12 },
         pb: { xs: 8, sm: 16 },
@@ -72,10 +80,12 @@ export default function Highlights() {
           }}
         >
           <Typography component="h2" variant="h4">
-            Highlights
+            Great Things Are Coming
           </Typography>
           <Typography variant="body1" sx={{ color: "grey.400" }}>
-            Explore why our product stands out: adaptability, durability, user-friendly design, and innovation. Enjoy reliable customer support and precision in every detail.
+            {
+              "I'm a tech enthusiast who whipped this up to lighten the load during job searches. There are so many upgrades bouncing around in my head, and a few are already in the works(mentioned below)."
+            }
           </Typography>
         </Box>
         <Grid container spacing={2.5}>
@@ -109,6 +119,22 @@ export default function Highlights() {
             </Grid>
           ))}
         </Grid>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <Typography textAlign="center" color="text.secondary" sx={{ alignSelf: "center", width: { sm: "100%", md: "80%" } }}>
+            If you have something similar in mind or any ideas to enhance the product, Feel free reach out to me!.
+          </Typography>
+          <Stack direction={{ xs: "column", sm: "row" }} alignSelf="center" spacing={1} useFlexGap sx={{ pt: 2, width: { xs: "100%", sm: "auto" } }}>
+            <Button variant="contained" color="primary" target="_blank" href="https://candibod.in/#contact">
+              Msg Feedback
+            </Button>
+          </Stack>
+        </Box>
       </Container>
     </Box>
   );

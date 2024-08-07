@@ -36,8 +36,6 @@ export default function LandingPageTemplate() {
         <Divider />
         <Highlights />
         <Divider />
-        {/* <Pricing /> */}
-        <Divider />
         <FAQ />
         <Divider />
         <Footer />
