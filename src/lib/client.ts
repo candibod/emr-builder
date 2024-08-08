@@ -188,6 +188,25 @@ class AuthClient {
       });
   }
 
+  async signInWithProvider(email: any, token: any, provider: any): Promise<{ error?: string }> {
+    return apiRequestHandler("auth/signin/provider", "POST", { email: email, idToken: token, provider: provider })
+      .then((response) => {
+        if (response.ok && response.data) {
+          const token = generateToken();
+          localStorage.setItem("emr-auth-token", token);
+          let { name, email }: any = response.data;
+          localStorage.setItem("user_full_name", name);
+          localStorage.setItem("user_email", email);
+          return {};
+        } else {
+          return { error: response.message };
+        }
+      })
+      .catch((error) => {
+        return { error: error.message };
+      });
+  }
+
   async verifyEmail(params: VerifyEmailParams): Promise<{ error?: string }> {
     const { mode, oobCode, apiKey } = params;
 

@@ -184,7 +184,7 @@ export function AppliedJobsList(): React.JSX.Element {
             }}
           >
             <FormControl sx={{ m: 1, minWidth: 120 }}>
-              <InputLabel id="demo-simple-select-label">Age</InputLabel>
+              <InputLabel id="demo-simple-select-label">Status</InputLabel>
               <Select autoFocus value={selectedJobStatus} label="Status" autoWidth onChange={handleStatusChange}>
                 <MenuItem value="rejected">Rejected</MenuItem>
               </Select>

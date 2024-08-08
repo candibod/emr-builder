@@ -74,7 +74,7 @@ export default function FAQ() {
           </AccordionSummary>
           <AccordionDetails>
             <Typography variant="body2" gutterBottom sx={{ maxWidth: { sm: "100%", md: "70%" } }}>
-              I work on this as a side project. If there is an important feature or bug that needs to be addressed, I typically provide updates every week.
+              I work on this as a side project, I typically provide updates bi-weekly. If there is an important feature or bug that needs to be addressed will work on ASAP.
             </Typography>
           </AccordionDetails>
         </Accordion>
