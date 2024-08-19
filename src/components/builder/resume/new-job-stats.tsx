@@ -80,7 +80,7 @@ export function NewJobStats(props: any): React.JSX.Element {
                 </CardContent>
                 <CardActions>
                   <Button sx={{ marginRight: "auto", marginLeft: "0" }} size="small">
-                    Download
+                    View
                   </Button>
                   <Button
                     sx={{ marginRight: "0", marginLeft: "auto" }}

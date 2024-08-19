@@ -561,6 +561,23 @@ class ScraperClient {
   }
 }
 
+class UtilsClient {
+  async fetchKeywords(text_input: any): Promise<{ data?: ApiResponse; error?: string }> {
+    return apiRequestHandler("resume/fetch-skills", "POST", { text_input: text_input })
+      .then((response) => {
+        if (response.ok) {
+          return { data: response.data };
+        } else {
+          return { error: response.message };
+        }
+      })
+      .catch((error) => {
+        return { error: error.message };
+      });
+  }
+}
+
 export const authClient = new AuthClient();
 export const resumeClient = new ResumeClient();
 export const scraperClient = new ScraperClient();
+export const utilsClient = new UtilsClient();

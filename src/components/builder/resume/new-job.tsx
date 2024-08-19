@@ -8,6 +8,7 @@ import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
+import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import InputLabel from "@mui/material/InputLabel";
 import FormControl from "@mui/material/FormControl";
@@ -19,7 +20,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 
 import { resumeClient } from "../../../lib/client";
-import CustomTextArea from "../../../lib/textarea";
 import { NewJobStats } from "../../../components/builder/resume/new-job-stats";
 
 const schema = zod.object({
@@ -97,7 +97,21 @@ export function NewJob(): React.JSX.Element {
                   name="job_description"
                   render={({ field: { onChange, value }, fieldState: { error } }) => (
                     <FormControl error={Boolean(errors.job_description)}>
-                      <CustomTextArea minRows={7} maxRows={12} placeholder="Enter job description" error={error ? true : false} onChange={onChange} value={value} />
+                      <TextField
+                        sx={{
+                          borderRadius: "8px",
+                          color: "grey[900]",
+                          background: "#fff",
+                          border: error ? "1px solid #f04438" : "0px solid #B0B8C4",
+                        }}
+                        autoFocus
+                        multiline
+                        maxRows={12}
+                        minRows={6}
+                        placeholder="Enter job description"
+                        onChange={onChange}
+                        value={value}
+                      />
                       <FormHelperText>
                         Add Roles, Duties, Responsibilities, Qualifications to increase accuracy, leave sections like About Us, Company information, Compensation and Benefits
                       </FormHelperText>

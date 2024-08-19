@@ -13,8 +13,6 @@ export function FullPageLoader({ isLoading = false }: LoaderProps): React.JSX.El
     // Do Nothing
   };
 
-  console.log("is OPen", isLoading);
-
   return (
     <Backdrop sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }} open={isLoading} onClick={handleClose}>
       <CircularProgress color="inherit" />
