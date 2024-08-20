@@ -19,10 +19,10 @@
     "firebase": "^10.12.5",
     "firebaseui": "^6.1.0",
     "next": "14.2.2",
+    "pdfjs-dist": "^4.5.136",
     "react": "^18",
     "react-dom": "^18",
     "react-draggable-list": "^4.2.1",
-    "react-pdf": "^9.1.0",
     "zod": "^3.22.5"
   },
   "devDependencies": {

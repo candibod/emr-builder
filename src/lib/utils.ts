@@ -1,4 +1,4 @@
-import { pdfjs } from "react-pdf";
+import { PDFWorker } from "pdfjs-dist";
 
 export default function getFormattedTime(time: string): string {
   if (!time || time.length == 0) {
@@ -23,13 +23,15 @@ export default function getFormattedTime(time: string): string {
 }
 
 export const extractTextFromPDF = async (file: any): Promise<any> => {
-  pdfjs.GlobalWorkerOptions.workerSrc = new URL("pdfjs-dist/build/pdf.worker.min.mjs", import.meta.url).toString();
+  const pdfJS = await import("pdfjs-dist");
+
+  pdfJS.GlobalWorkerOptions.workerSrc = window.location.origin + "/workers/pdf.worker.min.mjs";
 
   // Create a blob URL for the PDF file
   const blobUrl = URL.createObjectURL(file);
 
   // Load the PDF file
-  const loadingTask = pdfjs.getDocument(blobUrl);
+  const loadingTask = pdfJS.getDocument(blobUrl);
 
   let extractedText = "";
   let hadParsingError = false;
