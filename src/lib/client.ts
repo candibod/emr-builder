@@ -575,6 +575,20 @@ class UtilsClient {
         return { error: error.message };
       });
   }
+
+  async matchScore(text_input: any, job_description: any): Promise<{ data?: ApiResponse; error?: string }> {
+    return apiRequestHandler("resume/quick-match-stats", "POST", { text_input: text_input, job_description: job_description })
+      .then((response) => {
+        if (response.ok) {
+          return { data: response.data };
+        } else {
+          return { error: response.message };
+        }
+      })
+      .catch((error) => {
+        return { error: error.message };
+      });
+  }
 }
 
 export const authClient = new AuthClient();

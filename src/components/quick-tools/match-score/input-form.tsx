@@ -11,13 +11,14 @@ import Typography from "@mui/material/Typography";
 
 import { utilsClient } from "../../../lib/client";
 import { extractTextFromPDF } from "../../../lib/utils";
-import { FullPageLoader } from "../../../components/core/loaders";
-import { SnackBarNotification } from "../../../components/core/snack-bar";
+import { FullPageLoader } from "../../core/loaders";
+import { SnackBarNotification } from "../../core/snack-bar";
 
 export function InputForm(): React.JSX.Element {
   const [isPending, setIsPending] = React.useState<boolean>(false);
   const [textInput, setTextInput] = React.useState("");
-  const [keywords, setKeywords] = React.useState<any>([]);
+  const [jobDesc, setJobDesc] = React.useState("");
+  const [stats, setStats] = React.useState<any>({});
   const [noti, setNoti] = React.useState({ message: "", severity: "", open: 0 });
 
   function onFileChange(event: React.ChangeEvent<HTMLInputElement>): void {
@@ -34,17 +35,21 @@ export function InputForm(): React.JSX.Element {
     setTextInput(e.target.value);
   }
 
+  function onChangeJobDesc(e: any) {
+    setJobDesc(e.target.value);
+  }
+
   const onSubmit = async (event: any) => {
     event.preventDefault();
     setIsPending(true);
 
-    if (textInput.length == 0) {
+    if (textInput.length == 0 || jobDesc.length == 0) {
       setIsPending(false);
-      setNoti({ message: "Input cannot be empty", severity: "error", open: noti["open"] + 1 });
+      setNoti({ message: "Input fields cannot be empty", severity: "error", open: noti["open"] + 1 });
       return;
     }
 
-    const { data, error }: any = await utilsClient.fetchKeywords(textInput);
+    const { data, error }: any = await utilsClient.matchScore(textInput, jobDesc);
 
     if (error) {
       setIsPending(false);
@@ -53,7 +58,7 @@ export function InputForm(): React.JSX.Element {
     }
 
     if (data) {
-      setKeywords(data.keywords);
+      setStats(data);
     }
 
     setIsPending(false);
@@ -85,11 +90,12 @@ export function InputForm(): React.JSX.Element {
           <Box sx={{ maxWidth: "600px", width: "100%" }}>
             <Stack spacing={4}>
               <Stack spacing={1}>
-                <Typography variant="h4">Get the keywords in the Text</Typography>
+                <Typography variant="h4">Get Match Stats</Typography>
               </Stack>
               <Box>
                 <Stack spacing={2}>
-                  <TextField id="outlined-multiline-static" label="Input" multiline minRows={6} maxRows={12} onChange={onChangeTextInput} value={textInput} />
+                  <TextField label="Job Description" multiline minRows={6} maxRows={12} onChange={onChangeJobDesc} value={jobDesc} />
+                  <TextField label="Info" multiline minRows={6} maxRows={12} onChange={onChangeTextInput} value={textInput} />
                   <Box textAlign={"center"}>(OR)</Box>
                   <Box>
                     <label htmlFor="file">Load from file:</label> <input onChange={onFileChange} type="file" />
@@ -115,18 +121,35 @@ export function InputForm(): React.JSX.Element {
             p: 3,
           }}
         >
-          <Stack spacing={3}>
+          <Stack spacing={2}>
             <Typography textAlign={"center"} variant="button" color={"grey"}>
-              Count: {keywords.length}
+              Match Percent: {stats.match_percent}
             </Typography>
-            {keywords.length > 0 ? (
-              <Box sx={{ mt: "10px" }}>
-                {keywords.map((keyword: any, key: number) => (
+            <Typography color={"grey"}>Matched skills</Typography>
+            {stats.found && stats.found.length > 0 ? (
+              <Box>
+                {stats.found.map((keyword: any, key: number) => (
                   <Chip key={key} sx={{ mt: 1, mr: 1 }} variant="filled" color="success" label={keyword} />
                 ))}
               </Box>
             ) : (
-              <></>
+              <Typography textAlign={"center"} color={"grey"} variant="caption">
+                No Matched skills
+              </Typography>
+            )}
+            <Typography sx={{ mt: 2 }} color={"grey"}>
+              Un-Matched skills
+            </Typography>
+            {stats.not_found && stats.not_found.length > 0 ? (
+              <Box>
+                {stats.not_found.map((keyword: any, key: number) => (
+                  <Chip key={key} sx={{ mt: 1, mr: 1 }} variant="filled" color="warning" label={keyword} />
+                ))}
+              </Box>
+            ) : (
+              <Typography textAlign={"center"} color={"grey"} variant="caption">
+                No Un-Matched skills
+              </Typography>
             )}
           </Stack>
         </Box>
