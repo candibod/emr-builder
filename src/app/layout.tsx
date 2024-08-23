@@ -5,6 +5,7 @@ import "../styles/global.css";
 import { Inter } from "next/font/google";
 
 import { UserProvider } from "../contexts/user-context";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import { ThemeProvider } from "../components/core/theme-provider";
 
 export const viewport = { width: "device-width", initialScale: 1 } satisfies Viewport;
@@ -29,6 +30,7 @@ export default function Layout({ children }: LayoutProps): React.JSX.Element {
           <ThemeProvider>{children}</ThemeProvider>
         </UserProvider>
       </body>
+      <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID ? process.env.NEXT_PUBLIC_GA_ID : ""} />
     </html>
   );
 }
