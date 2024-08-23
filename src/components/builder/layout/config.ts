@@ -31,8 +31,8 @@ export const navItems = [
     href: "#",
     icon: "quick-tools",
     items: [
-      { key: "Get Keywords", title: "Get Keywords", href: "#", icon: "get-keywords" },
-      { key: "Job Match Score", title: "Job Match Score", href: "#", icon: "match-score" },
+      { key: "Get Keywords", title: "Get Keywords", href: paths.quickTools.getKeywords, icon: "get-keywords" },
+      { key: "Job Match Score", title: "Job Match Score", href: paths.quickTools.jobMatchScore, icon: "match-score" },
     ],
   },
   { key: "account", title: "Account", href: paths.builder.account, icon: "user" },

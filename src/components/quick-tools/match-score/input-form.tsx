@@ -121,11 +121,17 @@ export function InputForm(): React.JSX.Element {
             p: 3,
           }}
         >
-          <Stack spacing={2}>
-            <Typography textAlign={"center"} variant="button" color={"grey"}>
-              Match Percent: {stats.match_percent}
+          <Stack width={"100%"} spacing={2}>
+            {(stats.found && stats.found.length > 0) || (stats.not_found && stats.not_found.length > 0) ? (
+              <Typography textAlign={"center"} variant="button" color={"grey"}>
+                Match Percent: {stats.match_percent}
+              </Typography>
+            ) : (
+              <></>
+            )}
+            <Typography width={"100%"} color={"grey"}>
+              Matched skills
             </Typography>
-            <Typography color={"grey"}>Matched skills</Typography>
             {stats.found && stats.found.length > 0 ? (
               <Box>
                 {stats.found.map((keyword: any, key: number) => (

@@ -19,5 +19,9 @@ export const paths = {
     logs: "/scraper/logs",
     jobTracker: "/scraper/job-tracker",
   },
+  quickTools: {
+    getKeywords: "/quick-tools/get-keywords",
+    jobMatchScore: "/quick-tools/match-score",
+  },
   errors: { notFound: "/errors/not-found" },
 } as const;

@@ -175,8 +175,8 @@ class AuthClient {
         if (response.ok && response.data) {
           const token = generateToken();
           localStorage.setItem("emr-auth-token", token);
-          let { name, email }: any = response.data;
-          localStorage.setItem("user_full_name", name);
+          let { full_name, email }: any = response.data;
+          localStorage.setItem("user_full_name", full_name ? full_name : "User");
           localStorage.setItem("user_email", email);
           return {};
         } else {
@@ -194,8 +194,8 @@ class AuthClient {
         if (response.ok && response.data) {
           const token = generateToken();
           localStorage.setItem("emr-auth-token", token);
-          let { name, email }: any = response.data;
-          localStorage.setItem("user_full_name", name);
+          let { full_name, email }: any = response.data;
+          localStorage.setItem("user_full_name", full_name ? full_name : "User");
           localStorage.setItem("user_email", email);
           return {};
         } else {
@@ -215,8 +215,9 @@ class AuthClient {
         if (response.ok) {
           const token = generateToken();
           localStorage.setItem("emr-auth-token", token);
-          localStorage.setItem("user_full_name", token);
-          localStorage.setItem("emr-auth-token", token);
+          let { full_name, email }: any = response.data;
+          localStorage.setItem("user_full_name", full_name ? full_name : "User");
+          localStorage.setItem("user_email", email);
           return {};
         } else {
           return { error: response.message };

@@ -8,8 +8,8 @@ import WebIcon from "@mui/icons-material/Web";
 import AllInboxIcon from "@mui/icons-material/AllInbox";
 import WorkOutlineIcon from "@mui/icons-material/WorkOutline";
 import BuildCircleIcon from "@mui/icons-material/BuildCircle";
-import ManageSearchIcon from "@mui/icons-material/ManageSearch";
-import AssessmentIcon from "@mui/icons-material/Assessment";
+import FindInPageIcon from "@mui/icons-material/FindInPage";
+import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
 import PollIcon from "@mui/icons-material/Poll";
 import { SvgIconComponent } from "@mui/icons-material";
 
@@ -18,8 +18,8 @@ export const navIcons = {
   "upload-file": UploadFileOutlinedIcon,
   "copy-all": CopyAllOutlinedIcon,
   "quick-tools": BuildCircleIcon,
-  "get-keywords": ManageSearchIcon,
-  "match-score": AssessmentIcon,
+  "get-keywords": FindInPageIcon,
+  "match-score": CompareArrowsIcon,
   "job-tracker": PollIcon,
   description: DescriptionIcon,
   reviews: FileCopyOutlinedIcon,

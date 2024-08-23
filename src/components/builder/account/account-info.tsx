@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
@@ -8,37 +10,25 @@ import Divider from "@mui/material/Divider";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 
-const user = {
-  name: "EMR",
-  avatar: "/assets/avatar.png",
-  jobTitle: "Senior Developer",
-  country: "USA",
-  city: "Los Angeles",
-  timezone: "GTM-7",
-} as const;
-
 export function AccountInfo(): React.JSX.Element {
   return (
     <Card>
       <CardContent>
         <Stack spacing={2} sx={{ alignItems: "center" }}>
           <div>
-            <Avatar src={user.avatar} sx={{ height: "80px", width: "80px" }} />
+            <Avatar sx={{ height: "80px", width: "80px" }} />
           </div>
           <Stack spacing={1} sx={{ textAlign: "center" }}>
-            <Typography variant="h5">{user.name}</Typography>
-            <Typography color="text.secondary" variant="body2">
-              {user.city} {user.country}
-            </Typography>
-            <Typography color="text.secondary" variant="body2">
-              {user.timezone}
-            </Typography>
+            <Typography variant="h5">{typeof window !== "undefined" ? localStorage.getItem("user_full_name") : "User"}</Typography>
           </Stack>
+          <Typography color="text.secondary" variant="body2">
+            {typeof window !== "undefined" ? localStorage.getItem("user_email") : "User"}
+          </Typography>
         </Stack>
       </CardContent>
       <Divider />
       <CardActions>
-        <Button fullWidth variant="text">
+        <Button fullWidth disabled={true} variant="text">
           Upload picture
         </Button>
       </CardActions>

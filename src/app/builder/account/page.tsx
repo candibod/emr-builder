@@ -12,16 +12,17 @@ export const metadata = { title: `Account | Dashboard | ${config.site.name}` } s
 
 export default function Page(): React.JSX.Element {
   return (
-    <Stack spacing={3}>
-      <div>
-        <Typography variant="h4">Account</Typography>
-      </div>
-      <Grid container spacing={3}>
-        <Grid lg={4} md={6} xs={12}>
-          <AccountInfo />
+    <Stack width={"100%"} sx={{ p: 2 }}>
+      <Grid direction="column" container spacing={2}>
+        <Grid container justifyContent="center">
+          <Grid md={4} xs={12}>
+            <AccountInfo />
+          </Grid>
         </Grid>
-        <Grid lg={8} md={6} xs={12}>
-          <AccountDetailsForm />
+        <Grid container justifyContent="center">
+          <Grid md={8} xs={12}>
+            <AccountDetailsForm />
+          </Grid>
         </Grid>
       </Grid>
     </Stack>
