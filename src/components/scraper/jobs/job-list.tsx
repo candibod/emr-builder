@@ -20,6 +20,7 @@ import TableContainer from "@mui/material/TableContainer";
 import DialogContentText from "@mui/material/DialogContentText";
 
 import { scraperClient } from "../../../lib/client";
+import { DataGrid, GridColDef, GridAutosizeOptions, GridValueGetter } from "@mui/x-data-grid";
 
 import { useParams } from "next/navigation";
 import { FullPageLoader } from "../../core/loaders";
@@ -131,6 +132,76 @@ export function JobList(): React.JSX.Element {
 
   const visibleRows = React.useMemo(() => stableSort(jobsListData, getComparator(order, orderBy)), [jobsListData, order, orderBy]);
 
+  let rows: any = React.useMemo(() => {
+    return jobsListData;
+  }, [jobsListData]);
+
+  function getRowId(row: any) {
+    return row.job_id;
+  }
+
+  const getRawRowData: GridValueGetter<(typeof rows)[number], unknown> = (value, row) => {
+    return row;
+  };
+
+  function renderCompanyInfoCol(params: any) {
+    return (
+      <>
+        <b>{params.value?.company_name}</b>
+        <br />
+        <span>{params.value?.company_emp_count}</span>
+        <br />
+        <span>{params.value?.company_category} employees</span>
+      </>
+    );
+  }
+
+  function getActionButtons(params: any) {
+    return (
+      <>
+        <ButtonGroup size="small" aria-label="Small button group">
+          <Button target="_blank" href={params.value?.linkedin_url}>
+            View
+          </Button>
+          {appliedJobs.indexOf(params.value?.job_id) >= 0 || params.value?.is_applied ? (
+            <></>
+          ) : (
+            <Button data-id={params.value?.job_id} sx={{ whiteSpace: "nowrap" }} onClick={saveJobApply}>
+              Mark Applied
+            </Button>
+          )}
+          <Button data-id={params.value?.job_id} sx={{ whiteSpace: "nowrap" }} onClick={() => ShowStatsModel(params.value)}>
+            Skills Stats
+          </Button>
+        </ButtonGroup>
+      </>
+    );
+  }
+
+  const columns: GridColDef[] = [
+    {
+      field: "info",
+      headerName: "Company Info",
+      valueGetter: getRawRowData,
+      renderCell: renderCompanyInfoCol,
+      minWidth: 170,
+      resizable: false,
+    },
+    { field: "job_title", headerName: "Job Title", minWidth: 160, resizable: false },
+    { field: "posted_date", headerName: "Posted Date", minWidth: 120, resizable: false, disableColumnMenu: true },
+    { field: "applicant_count", headerName: "Application Count", minWidth: 140, resizable: false },
+    { field: "relevance_score", headerName: "Relevance Score", minWidth: 130, resizable: false },
+    { field: "match_percent", headerName: "Match Percent", minWidth: 125, resizable: false },
+    { field: "actions", headerName: "Actions", valueGetter: getRawRowData, renderCell: getActionButtons, minWidth: 300, align: "center", resizable: false },
+  ];
+
+  const autosizeOptions: GridAutosizeOptions = {
+    includeOutliers: true,
+    includeHeaders: true,
+    outliersFactor: 1,
+    expand: true,
+  };
+
   return (
     <Box
       sx={{
@@ -202,6 +273,10 @@ export function JobList(): React.JSX.Element {
           </Typography>
         </Stack>
       )}
+      <Box sx={{ width: "100%", minWidth: 0 }}>
+        <DataGrid rows={rows} columns={columns} getRowId={getRowId} getRowHeight={() => "auto"} autosizeOnMount={true} autosizeOptions={autosizeOptions} />
+      </Box>
+
       <FullPageLoader isLoading={isPending}></FullPageLoader>
       <Dialog fullWidth={true} maxWidth="md" open={open} onClose={handleClose}>
         <DialogTitle>Skills Match Stats</DialogTitle>
