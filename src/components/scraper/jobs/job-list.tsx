@@ -7,15 +7,13 @@ import Table from "@mui/material/Table";
 import Stack from "@mui/material/Stack";
 import Dialog from "@mui/material/Dialog";
 import Button from "@mui/material/Button";
-import TableRow from "@mui/material/TableRow";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableHead from "@mui/material/TableHead";
+import LinkIcon from "@mui/icons-material/Link";
 import Typography from "@mui/material/Typography";
 import DialogTitle from "@mui/material/DialogTitle";
 import ButtonGroup from "@mui/material/ButtonGroup";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
+import NorthEastIcon from "@mui/icons-material/NorthEast";
 import TableContainer from "@mui/material/TableContainer";
 import DialogContentText from "@mui/material/DialogContentText";
 
@@ -149,34 +147,47 @@ export function JobList(): React.JSX.Element {
       <>
         <b>{params.value?.company_name}</b>
         <br />
-        <span>{params.value?.company_emp_count}</span>
+        <span>{params.value?.company_category}</span>
         <br />
-        <span>{params.value?.company_category} employees</span>
+        <span>{params.value?.company_emp_count} employees</span>
       </>
     );
   }
 
-  function getActionButtons(params: any) {
+  function renderActionButtons(params: any) {
     return (
       <>
-        <ButtonGroup size="small" aria-label="Small button group">
-          <Button target="_blank" href={params.value?.linkedin_url}>
-            View
+        <Button size="small" variant="outlined" sx={{ p: "7px", m: 0.5, lineHeight: "14px" }} target="_blank" href={params.value?.linkedin_url}>
+          View
+        </Button>
+        {appliedJobs.indexOf(params.value?.job_id) >= 0 || params.value?.is_applied ? (
+          <></>
+        ) : (
+          <Button size="small" variant="outlined" sx={{ p: "7px", m: 0.5, lineHeight: "14px", whiteSpace: "nowrap" }} data-id={params.value?.job_id} onClick={saveJobApply}>
+            Apply
           </Button>
-          {appliedJobs.indexOf(params.value?.job_id) >= 0 || params.value?.is_applied ? (
-            <></>
-          ) : (
-            <Button data-id={params.value?.job_id} sx={{ whiteSpace: "nowrap" }} onClick={saveJobApply}>
-              Mark Applied
-            </Button>
-          )}
-          <Button data-id={params.value?.job_id} sx={{ whiteSpace: "nowrap" }} onClick={() => ShowStatsModel(params.value)}>
-            Skills Stats
-          </Button>
-        </ButtonGroup>
+        )}
+        <Button size="small" variant="outlined" sx={{ p: "7px", m: 0.5, lineHeight: "14px", whiteSpace: "nowrap" }} data-id={params.value?.job_id} onClick={() => ShowStatsModel(params.value)}>
+          Stats
+        </Button>
       </>
     );
   }
+
+  function renderHRInfo(params: any) {
+    return params.value?.hiring_manager_name ? (
+      <>
+        {params.value?.hiring_manager_name}
+        <a href={params.value?.hiring_manager_url || "#"} style={{ lineHeight: "1px" }} target="_blank">
+          <NorthEastIcon fontSize="small" />
+        </a>
+      </>
+    ) : null;
+  }
+
+  const valuesCompare = (v1: any, v2: any) => {
+    return v1.hiring_manager_name.localeCompare(v2.hiring_manager_name);
+  };
 
   const columns: GridColDef[] = [
     {
@@ -185,14 +196,39 @@ export function JobList(): React.JSX.Element {
       valueGetter: getRawRowData,
       renderCell: renderCompanyInfoCol,
       minWidth: 170,
+      flex: 1,
       resizable: false,
+      sortable: false,
     },
-    { field: "job_title", headerName: "Job Title", minWidth: 160, resizable: false },
-    { field: "posted_date", headerName: "Posted Date", minWidth: 120, resizable: false, disableColumnMenu: true },
-    { field: "applicant_count", headerName: "Application Count", minWidth: 140, resizable: false },
-    { field: "relevance_score", headerName: "Relevance Score", minWidth: 130, resizable: false },
-    { field: "match_percent", headerName: "Match Percent", minWidth: 125, resizable: false },
-    { field: "actions", headerName: "Actions", valueGetter: getRawRowData, renderCell: getActionButtons, minWidth: 300, align: "center", resizable: false },
+    { field: "job_title", headerName: "Job Title", minWidth: 160, flex: 1, display: "flex", resizable: false },
+    {
+      field: "hr",
+      headerName: "HR",
+      valueGetter: getRawRowData,
+      renderCell: renderHRInfo,
+      minWidth: 125,
+      flex: 1,
+      display: "flex",
+      resizable: false,
+      sortComparator: valuesCompare,
+      filterOperators: [
+        {
+          label: "Not Empty",
+          value: "notEmpty",
+          requiresFilterValue: false,
+          getApplyFilterFn: (filterItem: any, column: GridColDef) => {
+            return (row) => {
+              return row.hiring_manager_name.length > 0;
+            };
+          },
+        },
+      ],
+    },
+    { field: "posted_date", headerName: "Posted Date", minWidth: 120, flex: 1, display: "flex", resizable: false },
+    { field: "applicant_count", headerName: "Application Count", minWidth: 140, flex: 1, display: "flex", resizable: false },
+    { field: "relevance_score", headerName: "Relevance Score", minWidth: 130, flex: 1, display: "flex", resizable: false },
+    { field: "match_percent", headerName: "Match Percent", minWidth: 125, flex: 1, display: "flex", resizable: false },
+    { field: "actions", headerName: "Actions", valueGetter: getRawRowData, renderCell: renderActionButtons, minWidth: 250, align: "center", sortable: false, resizable: false },
   ];
 
   const autosizeOptions: GridAutosizeOptions = {
@@ -213,70 +249,9 @@ export function JobList(): React.JSX.Element {
         borderRadius: "30px",
       }}
     >
-      {visibleRows.length > 0 ? (
-        <TableContainer sx={{ maxHeight: "calc(100vh - 140px)" }}>
-          <Table stickyHeader sx={{ minWidth: 650 }} size="small" aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                <TableCell>Company Info</TableCell>
-                <TableCell>Job Title</TableCell>
-                <TableCell onClick={() => handleSort("posted_date", "desc")}>Posted Date</TableCell>
-                <TableCell onClick={() => handleSort("applicant_count", "desc")}>Application count</TableCell>
-                <TableCell>Relevance score</TableCell>
-                <TableCell onClick={() => handleSort("match_percent", "desc")}>Match Percent</TableCell>
-                <TableCell align="center" onClick={() => handleSort("index", "asc")}>
-                  Actions
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {visibleRows.map((row: any) => (
-                <TableRow key={row.job_id} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
-                  <TableCell component="th" scope="row">
-                    <b>{row.company_name}</b>
-                    <br />
-                    {row.company_category}
-                    <br />
-                    {row.company_emp_count} employees
-                  </TableCell>
-                  <TableCell>{row.job_title}</TableCell>
-                  <TableCell>{row.posted_date}</TableCell>
-                  <TableCell>{row.applicant_count}</TableCell>
-                  <TableCell>{row.relevance_score}</TableCell>
-                  <TableCell>{row.match_percent}</TableCell>
-                  <TableCell align="center">
-                    <ButtonGroup size="small" aria-label="Small button group">
-                      <Button target="_blank" href={row.linkedin_url}>
-                        View
-                      </Button>
-                      {appliedJobs.indexOf(row.job_id) >= 0 || row.is_applied ? (
-                        <></>
-                      ) : (
-                        <Button data-id={row.job_id} sx={{ whiteSpace: "nowrap" }} onClick={saveJobApply}>
-                          Mark Applied
-                        </Button>
-                      )}
-                      <Button data-id={row.job_id} sx={{ whiteSpace: "nowrap" }} onClick={() => ShowStatsModel(row)}>
-                        Skills Stats
-                      </Button>
-                    </ButtonGroup>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      ) : (
-        <Stack spacing={1}>
-          <Typography align="center" variant="subtitle1" sx={{ p: 4, color: "#8b8b8b" }}>
-            Fetching Jobs...
-          </Typography>
-        </Stack>
-      )}
-      <Box sx={{ width: "100%", minWidth: 0 }}>
+      <Box sx={{ width: "100%", height: "calc(100vh - 140px)" }}>
         <DataGrid rows={rows} columns={columns} getRowId={getRowId} getRowHeight={() => "auto"} autosizeOnMount={true} autosizeOptions={autosizeOptions} />
       </Box>
-
       <FullPageLoader isLoading={isPending}></FullPageLoader>
       <Dialog fullWidth={true} maxWidth="md" open={open} onClose={handleClose}>
         <DialogTitle>Skills Match Stats</DialogTitle>
