@@ -21,8 +21,7 @@ const logoStyle = {
 function Copyright() {
   return (
     <Typography variant="body2" color="text.secondary" mt={1}>
-      {"Copyright © "}
-      <Link href="https://mui.com/">Candibod&nbsp;</Link>
+      {"Copyright © Candibod"}&nbsp;
       {new Date().getFullYear()}
     </Typography>
   );
@@ -116,7 +115,10 @@ export default function Footer() {
             color: "text.secondary",
           }}
         >
-          <IconButton color="inherit" href="https://github.com/candibod/emr-builder" target="_blank" aria-label="GitHub" sx={{ alignSelf: "center" }}>
+          <IconButton color="inherit" href="mailto:#" aria-label="X" sx={{ alignSelf: "center" }}>
+            <AlternateEmailIcon />
+          </IconButton>
+          {/* <IconButton color="inherit" href="https://github.com/candibod/emr-builder" target="_blank" aria-label="GitHub" sx={{ alignSelf: "center" }}>
             <FacebookIcon />
           </IconButton>
           <IconButton color="inherit" href="mailto:reddyjeevan95@gmail.com" aria-label="X" sx={{ alignSelf: "center" }}>
@@ -124,7 +126,7 @@ export default function Footer() {
           </IconButton>
           <IconButton color="inherit" href="https://www.linkedin.com/in/jeevan-reddy/" target="_blank" aria-label="LinkedIn" sx={{ alignSelf: "center" }}>
             <LinkedInIcon />
-          </IconButton>
+          </IconButton> */}
         </Stack>
       </Box>
     </Container>

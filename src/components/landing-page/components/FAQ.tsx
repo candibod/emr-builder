@@ -41,7 +41,7 @@ export default function FAQ() {
         Q/A
       </Typography>
       <Box sx={{ width: "100%" }}>
-        <Accordion expanded={expanded === "panel1"} onChange={handleChange("panel1")}>
+        {/* <Accordion expanded={expanded === "panel1"} onChange={handleChange("panel1")}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1d-content" id="panel1d-header">
             <Typography component="h3" variant="subtitle2">
               Can I request a demo or walk through of your product
@@ -65,7 +65,7 @@ export default function FAQ() {
               We welcome your feedback! You can reach me by emailing reddyjeevan95@gmail.com
             </Typography>
           </AccordionDetails>
-        </Accordion>
+        </Accordion> */}
         <Accordion expanded={expanded === "panel3"} onChange={handleChange("panel3")}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel3d-content" id="panel3d-header">
             <Typography component="h3" variant="subtitle2">
